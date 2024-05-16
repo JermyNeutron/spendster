@@ -18,19 +18,30 @@ def pdf_drag_drop(test):
 
 # pdf text scraper
 def extraction_func(test,pdf_path):
-    text = extract_text(pdf_path)
-    return text
+        text = extract_text(pdf_path)
+        return text
 
 
 # writes and store extracted text
-def extraction_writing(test, text):
-
-    with open('temp/temp_scrape.txt', 'w') as file:
+def extraction_writing(test,text):
+    path = 'temp/temp_scrape.txt' if not test else 'temp/test_temp_scrape.txt'
+    with open(path, 'w') as file:
         file.write(text)
+
+
+# pdf location verification
+def loc_ver(test):
+    while True:
+        pdflink = pdf_drag_drop(test)
+        try:
+            extracted_text = extraction_func(test,pdflink)
+            extraction_writing(test,extracted_text)
+            break
+        except FileNotFoundError:
+            print('File not found. Try again.\n')
 
 
 if __name__ == '__main__':
     test = True
-    pdflink = pdf_drag_drop(test)
-    extracted_text = extraction_func(test,pdflink)
-    extraction_writing(test,extracted_text)
+    loc_ver(test)
+    print('program finished')

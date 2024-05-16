@@ -1,4 +1,6 @@
 rep_statements/
 venv/
-temp_scrape.txt
+test_temp_scrape.txt
 scratch1.py
+spendster_workspace.code-workspace
+__pycache__
