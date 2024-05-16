@@ -2,7 +2,10 @@
 A quick way to scrape your bank and credit card statements for your own personal tracking.
 
 >[!WARNING]
-> As of 05/16/2024, only Chase Sapphire Preserved statements are being developed at this moment. 
+> As of 05/16/2024, these are the only tested statements:
+> - Chase Sapphire Preferred
+>
+> This will be updated as additional statements and institutions are prepared. 
 
 <!-- ## Setup -->
 
@@ -16,4 +19,4 @@ A quick way to scrape your bank and credit card statements for your own personal
 - pdfminer.six
 
 ### Github
-Visit https://github.com/JermyNeutron/myhours-app
+Visit https://github.com/JermyNeutron/spendster
