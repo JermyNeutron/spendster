@@ -2,7 +2,7 @@
 A quick way to scrape your bank and credit card statements for your own personal tracking.
 
 >[!WARNING]
-> As of 05/16/2024, these are the only tested statements:
+> As of 05/16/2024, these are the only supported statements:
 > - Chase Sapphire Preferred
 >
 > This will be updated as additional statements and institutions are prepared. 
