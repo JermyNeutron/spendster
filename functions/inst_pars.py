@@ -31,11 +31,12 @@ def ident_inst(extracted_text):
 def main(test, path):
     extracted_text = extraction_func(path)
     institution = ident_inst(extracted_text)
-    if test:
-        print(f'TEST: {ident_inst}: INSTITUTION FOUND: {institution}')
     if institution in ident_Chase:
-        return "Chase"
+        if test:
+            print(f'TEST: {ident_inst}: INSTITUTION FOUND: {institution}')
+        inst_return =  "Chase"
     extraction_writing(test, extracted_text)
+    return inst_return
 
 
 if __name__ == '__main__':
