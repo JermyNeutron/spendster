@@ -8,19 +8,24 @@ sys.path.append('.')
 def pdf_drag_drop(test):
     input_pdflink = input('Drag and drop file here: ')
     # clean input
-    pdflink_pos = input_pdflink.find("c")
-    pdflink_strstart = input_pdflink[pdflink_pos:-1]
-    pdflink = pdflink_strstart.replace('\\', '/')
-    # testing purposes
-    if test:
-        print(f"TEST: You provided: {pdflink}")
-    return pdflink
+    if input_pdflink.lower() == 'q':
+        return False
+    else:
+        pdflink_pos = input_pdflink.lower().find("c")
+        pdflink_strstart = input_pdflink[pdflink_pos:-1]
+        pdflink = pdflink_strstart.replace('\\', '/')
+        # testing purposes
+        if test:
+            print(f"TEST: You provided: {pdflink}")
+        return pdflink
 
 
 # pdf location verification
 def main(test):
     while True:
         pdflink = pdf_drag_drop(test)
+        if not pdflink:
+            break
         try:
             institution = inst_pars.main(test, pdflink)
             path = 'temp/temp_scrape.txt' if not test else 'temp/test_temp_scrape.txt'
