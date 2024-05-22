@@ -4,7 +4,7 @@ from functions import inst_pars, chase_sapphire_pref
 sys.path.append('.')
 
 
-# pdf filedrop prompt
+# PDF file drag and drop prompt.
 def pdf_drag_drop(test):
     input_pdflink = input('Drag and drop file here: ')
     # clean input
@@ -20,7 +20,7 @@ def pdf_drag_drop(test):
         return pdflink
 
 
-# pdf location verification
+# PDF location verification and script execution.
 def main(test):
     while True:
         pdflink = pdf_drag_drop(test)
@@ -34,7 +34,9 @@ def main(test):
             # institution-specific analysis
             if institution == 'Chase':
                 chase_sapphire_pref.main(test, extracted_text)
-            return False
+                return False
+            else:
+                print('Institution or statement not supported.\nPlease submit an issue and we\'ll get right to it.')
         except FileNotFoundError:
             print('File not found. Try again.\n')
 

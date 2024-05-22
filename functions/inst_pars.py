@@ -5,29 +5,31 @@ from pdfminer.high_level import extract_text as pdfmextract_text
 '''Supported Institutions and Statements
 - Chase Sapphire Preferred
 '''
+
 list_institutions = ['Chase Mobile']
 ident_Chase = ['Chase Mobile', 'Sapphire Preferred', 'Sapphire Reserved', 'Chase']
 
-# extract text
+# Extract text from the provided path.
 def extraction_func(path):
     text = pdfmextract_text(path)
     return text
 
 
-# write extracted text to temp file
+# Write the extracted text to temp file.
 def extraction_writing(test, text):
     path = 'temp/temp_scrape.txt' if not test else 'temp/test_temp_scrape.txt'
     with open(path, 'w') as file:
         file.write(text)
 
 
-# parse text to identify institution
+# Parse text to identify the institution.
 def ident_inst(extracted_text):
     for inst in list_institutions:
         if inst in extracted_text:
             return inst
 
 
+# Main function of script.
 def main(test, path):
     extracted_text = extraction_func(path)
     institution = ident_inst(extracted_text)
