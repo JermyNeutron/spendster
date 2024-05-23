@@ -40,7 +40,7 @@ def find_available_points(extracted_text):
 
 
 # Main function of script.
-def main(test, extracted_text, stmt_essential_keys):
+def main(test, extracted_text, stmt_essential_keys=stmt_essential_keys):
     if test:
         print("TEST:", main)
     # Set up return statement.
