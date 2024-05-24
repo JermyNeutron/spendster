@@ -1,6 +1,7 @@
 rep_statements/
 venv/
 test_temp_scrape.txt
+scratch/
 scratch1.py
 scratch2.py
 spendster_workspace.code-workspace
