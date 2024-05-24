@@ -7,7 +7,7 @@ from functions.inst_pars import extraction_func
 
 
 # Dictionary keys to return.
-stmt_essential_keys = ['balance', 'payment', 'points']
+stmt_essential_keys = ['month', 'balance', 'payment', 'points']
 
 
 # Scrape document.
@@ -19,6 +19,14 @@ def keyword_search(extracted_text, keyphrase):
             if i + 2 < len(lines):
                 return lines[i+2].strip()
     return None
+
+
+''' Dictionary assignment functions '''
+
+# Find statement's balance.
+def find_month(extracted_text):
+    keyphrase = 'SCENARIO-1D'
+    return keyword_search(extracted_text,keyphrase)
 
 
 # Find statement's balance.
@@ -46,13 +54,16 @@ def main(test, extracted_text, stmt_essential_keys=stmt_essential_keys):
     # Set up return statement.
     export_text = []
     stmt_essential_dict = {key: None for key in stmt_essential_keys}
+    # Dictionary population functions.
+    stmt_essential_dict['month'] = " ".join((find_month(extracted_text)).split()) # Removes double space.
     stmt_essential_dict['balance'] = (find_new_balance(extracted_text))
     stmt_essential_dict['payment'] = (find_min_payment(extracted_text))
     stmt_essential_dict['points'] = (find_available_points(extracted_text))
-    # Pack export_text to return
+    # Pack export_text to return.
     export_text.append(stmt_essential_dict)
-    # Balance, Minimum Payment, Reward Points
-    print(export_text)
+    # [Balance, Minimum Payment, Reward Points]
+    if test:
+        print(export_text)
 
 
 if __name__ == '__main__':
