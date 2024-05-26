@@ -9,6 +9,21 @@ from functions.inst_pars import extraction_func
 # Dictionary keys to return.
 stmt_essential_keys = ['month', 'balance', 'payment', 'points']
 
+# Month rollback for statement (February due date is January's statement)
+stmt_monthrollback = {
+    1: 'January',
+    2: 'February',
+    3: 'March',
+    4: 'April',
+    5: 'May',
+    6: 'June',
+    7: 'July',
+    8: 'August',
+    9: 'September',
+    10: 'October',
+    11: 'November',
+    12: 'December',
+}
 
 # Scrape document.
 def keyword_search(extracted_text, keyphrase):
@@ -23,10 +38,20 @@ def keyword_search(extracted_text, keyphrase):
 
 ''' Dictionary assignment functions '''
 
-# Find statement's balance.
+# Rollback to correct month.
+def month_rollback(stmt_month=str):
+    var_month, var_year = stmt_month.split()
+    for i, value in stmt_monthrollback.items():
+        if value == var_month:
+            var_month = stmt_monthrollback[i-1]
+    return f"{var_month} {var_year}"
+
+
+# Find statement's month.
 def find_month(extracted_text):
     keyphrase = 'SCENARIO-1D'
-    return keyword_search(extracted_text,keyphrase)
+    return_month = keyword_search(extracted_text,keyphrase)
+    return month_rollback(return_month)
 
 
 # Find statement's balance.
