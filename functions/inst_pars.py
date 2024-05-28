@@ -31,13 +31,16 @@ def ident_inst(extracted_text):
 
 # Main function of script.
 def main(test, path):
+    inst_return = None
     extracted_text = extraction_func(path)
     institution = ident_inst(extracted_text)
     if institution in ident_Chase:
         if test:
             print(f'TEST: {ident_inst}: INSTITUTION FOUND: {institution}')
         inst_return =  "Chase"
-    extraction_writing(test, extracted_text)
+        extraction_writing(test, extracted_text)
+    else: # change to elif
+        pass
     return inst_return
 
 
