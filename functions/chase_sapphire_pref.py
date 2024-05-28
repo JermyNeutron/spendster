@@ -124,7 +124,7 @@ def find_starting_merchants(test, merchant_counter):
                     # print(f"price starts at {counter}")
                     # print(f"merchant list: {merchants}")
                     return counter, merchants
-    return counter, merchants
+    return merchants, counter
 
 
 # Collect first page's amounts.
@@ -145,7 +145,25 @@ def find_starting_amounts(test, price_counter):
                     # print(f"price ends at {counter}")
                     # print(*(i for i in price_amounts), sep='\n')
                     return counter, price_amounts
-    return counter, price_amounts
+    return price_amounts, counter
+
+
+# Collect second page's transaction dates.
+def find_addl_dates1(test):
+    # return counter, dates
+    pass
+
+
+# Collect second page's merchants.
+def find_addl_merchants1(test, merchant_addl_counter1):
+    # return counter, merchants
+    pass
+
+
+# Collect second page's amounts.
+def find_addl_amounts1(test, amounts_addl_counter1):
+    # return amounts
+    pass
 
 
 # Main function of script.
@@ -163,12 +181,14 @@ def main(test, extracted_text, stmt_essential_keys=stmt_essential_keys):
     # Pack export_text to return.
     export_text.append(stmt_essential_dict)
     fp_dates, merchant_counter = find_starting_dates(test)
-    price_counter, fp_merchants = find_starting_merchants(test, merchant_counter)
-    end_counter, fp_prices = find_starting_amounts(test, price_counter)
-    ''' need to collect prices '''
+    fp_merchants, price_counter = find_starting_merchants(test, merchant_counter)
+    fp_prices, end_counter = find_starting_amounts(test, price_counter)
     ''' need to collect next dates '''
+    # find_addl_dates1(test)
     ''' need to collect next merchants '''
+    # find_addl_merchants1(test, merchant_addl_counter1)
     ''' need to collect next prices '''
+    # find_addl_amounts1(test, amounts_addl_counter1)
     # [Balance, Minimum Payment, Reward Points]
     if test:
         print(F"TEST: {export_text}")
