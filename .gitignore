@@ -1,8 +1,18 @@
+# Reference/Mock files
 rep_statements/
+
+# Virtual Environment
 venv/
-test_temp_scrape.txt
+
+# Scratch Files
+find_line_in_text.py
 scratch/
 scratch1.py
 scratch2.py
+test_temp_scrape.txt
+
+# VS Code workspace
 spendster_workspace.code-workspace
+
+# Python
 __pycache__
