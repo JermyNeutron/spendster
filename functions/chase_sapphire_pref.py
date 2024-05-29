@@ -89,7 +89,8 @@ def find_starting_dates(test):
     for line_number, line in enumerate(extracted_text, start=1):
         if phrase in line:
             counter = line_number + 2 # add 2 to counter to start on dates
-            # print(f"should start dates at {counter}")
+            if test:
+                print(f"\nTEST: dates start at: {counter}")
             break
     dates = []
     date_pattern = re.compile(r'^\d{2}/\d{2}$')
@@ -100,7 +101,10 @@ def find_starting_dates(test):
                     dates.append(line.strip())
                     counter += 2
                 else:
-                    # print(f"merchants start at {counter}")
+                    if test:
+                        print(f"\nTEST: merchants start at {counter}")
+                        print(f"TEST: first page's dates: {dates}")
+                        print(f"TEST: {find_starting_dates}: completed.")
                     return dates, counter
     return dates, counter
 
@@ -121,9 +125,11 @@ def find_starting_merchants(test, merchant_counter):
                     merchant_counter += 2
                 else:
                     counter = line_number + 4
-                    # print(f"price starts at {counter}")
-                    # print(f"merchant list: {merchants}")
-                    return counter, merchants
+                    if test:
+                        print(f"\nTEST: price starts at {counter}")
+                        print(f"TEST: first page merchants: {merchants}")
+                        print(f"TEST: {find_starting_merchants}: completed.")
+                    return merchants, counter
     return merchants, counter
 
 
@@ -141,35 +147,98 @@ def find_starting_amounts(test, price_counter):
                     price_amounts.append(float(line))
                     price_counter += 2
                 except ValueError:
-                    counter = line_number
-                    # print(f"price ends at {counter}")
-                    # print(*(i for i in price_amounts), sep='\n')
-                    return counter, price_amounts
+                    counter = line_number - 2
+                    if test:
+                        print(f"\nTEST: price ends at {counter}")
+                        print(f"TEST: first page amounts: {price_amounts}")
+                        print(f"TEST: {find_starting_amounts}: completed.")
+                    return price_amounts, counter
     return price_amounts, counter
 
 
 # Collect second page's transaction dates.
 def find_addl_dates1(test):
-    # return counter, dates
-    pass
+    path = 'temp/temp_scrape.txt' if not test else 'temp/test_temp_scrape.txt'
+    with open(path, 'r') as file:
+        extracted_text = file.readlines()
+    phrase = 'Date of\n'
+    occurrences = []
+    for line_number, line in enumerate(extracted_text, start=1):
+        if line == phrase:
+            occurrences.append((line_number))
+    counter = occurrences.pop() + 3
+    dates = []
+    date_pattern = re.compile(r'^\d{2}/\d{2}$')
+    while counter < len(extracted_text):
+        for line_number, line in enumerate(extracted_text, start=1):
+            if line_number == counter:
+                if date_pattern.match(line.strip()):
+                    dates.append(line.strip())
+                    counter += 2
+                else:
+                    if test:
+                        counter += 2
+                        print(f"\nTEST: second page's merchants start at {counter}")
+                        print(f"TEST: second page's dates: {dates}")
+                        print(f"TEST: second page limit: {len(dates)}")
+                        print(f"TEST: {find_addl_dates1}: completed.")
+                    return dates, counter, len(dates)
+    return dates, counter
 
 
 # Collect second page's merchants.
-def find_addl_merchants1(test, merchant_addl_counter1):
-    # return counter, merchants
-    pass
+def find_addl_merchants1(test, sp_mercounter):
+    path = 'temp/temp_scrape.txt' if not test else 'temp/test_temp_scrape.txt'
+    with open(path, 'r') as file:
+        extracted_text = file.readlines()
+    counter = sp_mercounter
+    ending_phrase = 'INTEREST CHARGED'
+    merchants = []
+    while counter < len(extracted_text):
+        for line_number, line in enumerate(extracted_text, start=1):
+            if line_number == counter:
+                if ending_phrase != line.strip():
+                    merchants.append(line.strip())
+                    counter += 2
+                else:
+                    if test:
+                        print(f"\nTEST: second pages merchants: {merchants}")
+                        print(f"TEST: {find_addl_merchants1}: completed.")
+                    return merchants
+    return merchants
 
 
 # Collect second page's amounts.
-def find_addl_amounts1(test, amounts_addl_counter1):
+def find_addl_amounts1(test, limit):
+    path = 'temp/temp_scrape.txt' if not test else 'temp/test_temp_scrape.txt'
+    with open(path, 'r') as file:
+        extracted_text = file.readlines()
+    phrase = "$ Amount\n"
+    occurrences = []
+    for line_number, line in enumerate(extracted_text, start=1):
+        if phrase == line:
+            occurrences.append(line_number)
+    placement = occurrences.pop() + 2
+    price_amounts = []
+    while placement < len(extracted_text):
+        for line_number, line in enumerate(extracted_text, start=1):
+            if line_number == placement:
+                if len(price_amounts) < limit:
+                    price_amounts.append(float(line))
+                    placement += 2
+                    if len(price_amounts) == 2:
+                        if test:
+                            print(f"\nTEST: second page amounts: {price_amounts}")
+                            print(f"TEST: {find_addl_amounts1}: completed.")
+                        return price_amounts
+    return price_amounts
     # return amounts
-    pass
 
 
 # Main function of script.
 def main(test, extracted_text, stmt_essential_keys=stmt_essential_keys):
     if test:
-        print("TEST:", main)
+        print(f"\n\nTEST: {main} running...")
     # Set up return statement.
     export_text = []
     stmt_essential_dict = {key: None for key in stmt_essential_keys}
@@ -180,18 +249,18 @@ def main(test, extracted_text, stmt_essential_keys=stmt_essential_keys):
     stmt_essential_dict['points'] = (find_available_points(extracted_text))
     # Pack export_text to return.
     export_text.append(stmt_essential_dict)
-    fp_dates, merchant_counter = find_starting_dates(test)
-    fp_merchants, price_counter = find_starting_merchants(test, merchant_counter)
-    fp_prices, end_counter = find_starting_amounts(test, price_counter)
+    fp_dates, fp_mercounter = find_starting_dates(test)
+    fp_merchants, fp_pricounter = find_starting_merchants(test, fp_mercounter)
+    fp_prices, fp_endcounter = find_starting_amounts(test, fp_pricounter) # NORMAL: fp_endcounter not referenced anywhere
     ''' need to collect next dates '''
-    # find_addl_dates1(test)
+    sp_dates, sp_mercounter, sp_limit = find_addl_dates1(test)
     ''' need to collect next merchants '''
-    # find_addl_merchants1(test, merchant_addl_counter1)
+    sp_merchants = find_addl_merchants1(test, sp_mercounter)
     ''' need to collect next prices '''
-    # find_addl_amounts1(test, amounts_addl_counter1)
+    sp_prices = find_addl_amounts1(test, sp_limit)
     # [Balance, Minimum Payment, Reward Points]
     if test:
-        print(F"TEST: {export_text}")
+        print(F"\nTEST: fnc return {export_text}")
 
 
 if __name__ == '__main__':
@@ -199,3 +268,5 @@ if __name__ == '__main__':
     path = 'rep_statements/20240111-statements-1149-.pdf'
     extracted_text = extraction_func(path)
     main(test, extracted_text)
+    if test:
+        print(f"TEST: {main} script completed.")
