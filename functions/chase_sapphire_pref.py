@@ -1,5 +1,6 @@
 # Chase Sapphire Preferred
 
+import csv
 import re
 import sys
 
@@ -79,6 +80,9 @@ def find_available_points(extracted_text):
     return keyword_search(extracted_text,keyphrase)
 
 
+''' First page scraping '''
+
+
 # Find starting index for transaction dates.
 def find_starting_dates(test):
     path = 'temp/temp_scrape.txt' if not test else 'temp/test_temp_scrape.txt'
@@ -155,6 +159,28 @@ def find_starting_amounts(test, price_counter):
                     return price_amounts, counter
     return price_amounts, counter
 
+
+''' Second page scraping '''
+
+
+# Determine if there is a second transaction page.
+def is_sp(test):
+    path = 'temp/temp_scrape.txt' if not test else 'temp/test_temp_scrape.txt'
+    with open(path, 'r') as file:
+        extracted_text = file.readlines()
+    phrase = "Date of\n"
+    occurrences = []
+    for line_number, line in enumerate(extracted_text, start=1):
+        if phrase == line:
+            occurrences.append(line_number)
+    if len(occurrences) <= 2:
+        if test:
+           print('\nTEST: There are multiple pages of transactions')
+        return True
+    else:
+        if test:
+           print('\nTEST: There is only one page of transactions')
+        return False
 
 # Collect second page's transaction dates.
 def find_addl_dates1(test):
@@ -235,6 +261,11 @@ def find_addl_amounts1(test, limit):
     # return amounts
 
 
+# Pack and write organized data into csv.
+def create_csv():
+    pass
+
+
 # Main function of script.
 def main(test, extracted_text, stmt_essential_keys=stmt_essential_keys):
     if test:
@@ -252,12 +283,10 @@ def main(test, extracted_text, stmt_essential_keys=stmt_essential_keys):
     fp_dates, fp_mercounter = find_starting_dates(test)
     fp_merchants, fp_pricounter = find_starting_merchants(test, fp_mercounter)
     fp_prices, fp_endcounter = find_starting_amounts(test, fp_pricounter) # NORMAL: fp_endcounter not referenced anywhere
-    ''' need to collect next dates '''
-    sp_dates, sp_mercounter, sp_limit = find_addl_dates1(test)
-    ''' need to collect next merchants '''
-    sp_merchants = find_addl_merchants1(test, sp_mercounter)
-    ''' need to collect next prices '''
-    sp_prices = find_addl_amounts1(test, sp_limit)
+    if is_sp(test):
+        sp_dates, sp_mercounter, sp_limit = find_addl_dates1(test)
+        sp_merchants = find_addl_merchants1(test, sp_mercounter)
+        sp_prices = find_addl_amounts1(test, sp_limit)
     # [Balance, Minimum Payment, Reward Points]
     if test:
         print(F"\nTEST: fnc return {export_text}")
