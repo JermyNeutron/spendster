@@ -12,7 +12,10 @@ def pdf_drag_drop(test):
         return False
     else:
         pdflink_pos = input_pdflink.lower().find("c")
-        pdflink_strstart = input_pdflink[pdflink_pos:-1]
+        if input_pdflink.lower().endswith('\n'):
+            pdflink_strstart = input_pdflink[pdflink_pos:-1]
+        else:
+            pdflink_strstart = input_pdflink[pdflink_pos:]
         pdflink = pdflink_strstart.replace('\\', '/')
         # testing purposes
         if test:
