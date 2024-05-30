@@ -10,6 +10,7 @@ scratch/
 scratch1.py
 scratch2.py
 test_temp_scrape.txt
+test_temp.csv
 
 # VS Code workspace
 spendster_workspace.code-workspace
