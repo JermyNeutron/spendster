@@ -9,6 +9,7 @@ from pdfminer.high_level import extract_text as pdfmextract_text
 list_institutions = ['Chase Mobile']
 ident_Chase = ['Chase Mobile', 'Sapphire Preferred', 'Sapphire Reserved', 'Chase']
 
+
 # Extract text from the provided path.
 def extraction_func(path):
     text = pdfmextract_text(path)
@@ -35,7 +36,7 @@ def main(test, path):
     institution = ident_inst(extracted_text)
     if institution in ident_Chase:
         if test:
-            print(f'TEST: {ident_inst}: INSTITUTION FOUND: {institution}')
+            print(f'\nTEST: {ident_inst}: INSTITUTION FOUND: {institution}')
         inst_return =  "Chase"
         extraction_writing(test, extracted_text)
         return inst_return
@@ -45,9 +46,18 @@ def main(test, path):
 
 if __name__ == '__main__':
     test = True
-    path = 'rep_statements/20240111-statements-1149-.pdf'
-    institution = main(test, path)
-    if institution in ident_Chase:
-        print('This document belongs to Chase Bank')
-    else:
-        print('wtf is this?!')
+    path_1 = 'rep_statements/20240111-statements-1149-.pdf'
+    path_2 = 'rep_statements/20240511-statements-1149-.pdf'
+    test_choice = input('Choose path: ')
+    try:
+        if test_choice == '1':
+            institution = main(test, path_1)
+        elif test_choice == '2':
+            institution = main(test, path_2)
+        if institution in ident_Chase:
+            print('This document belongs to Chase Bank')
+        else:
+            print('wtf is this?!')
+    except NameError as e:
+        print('Invalid choice.')
+        
