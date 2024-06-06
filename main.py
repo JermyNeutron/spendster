@@ -1,4 +1,6 @@
 import sys
+import pdfminer
+import pdfminer.pdfparser
 from functions import inst_pars, chase_sapphire_pref
 
 sys.path.append('.')
@@ -13,6 +15,8 @@ def pdf_drag_drop(test):
     else:
         pdflink_pos = input_pdflink.lower().find("c")
         if input_pdflink.lower().endswith('\n'):
+            pdflink_strstart = input_pdflink[pdflink_pos:-1]
+        elif input_pdflink.lower().endswith('\''):
             pdflink_strstart = input_pdflink[pdflink_pos:-1]
         else:
             pdflink_strstart = input_pdflink[pdflink_pos:]
@@ -30,16 +34,21 @@ def main(test):
         if not pdflink:
             break
         try:
-            institution = inst_pars.main(test, pdflink)
-            path = 'temp/temp_scrape.txt' if not test else 'temp/test_temp_scrape.txt'
-            with open(path, 'r') as file:
-                extracted_text = file.read()
-            # institution-specific analysis
-            if institution == 'Chase':
-                chase_sapphire_pref.main(test, extracted_text)
-                return False
-            else:
-                print('Institution or statement not supported.\nPlease submit an issue and we\'ll get right to it.')
+            try:
+                institution = inst_pars.main(test, pdflink)
+                path = 'temp/temp_scrape.txt' if not test else 'temp/test_temp_scrape.txt'
+                with open(path, 'r') as file:
+                    extracted_text = file.read()
+                # institution-specific analysis
+                if institution == 'Chase':
+                    chase_sapphire_pref.main(test, extracted_text)
+                    if test:
+                        print('\nTEST: csv created.')
+                    return False
+                else:
+                    print('Institution or statement not supported.\nPlease submit an issue and we\'ll get right to it.')
+            except pdfminer.pdfparser.PDFSyntaxError as e:
+                print('File not found. Try again.\n')
         except FileNotFoundError:
             print('File not found. Try again.\n')
 
