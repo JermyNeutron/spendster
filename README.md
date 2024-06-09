@@ -18,6 +18,7 @@ Drag and drop your bank statement into the prompt to create a comma-separated va
 
 ### Libraries
 - pdfminer.six
+- pyperclip
 
 ### Github
 Visit https://github.com/JermyNeutron/spendster
