@@ -42,8 +42,6 @@ def main(test):
                 # institution-specific analysis
                 if institution == 'Chase':
                     chase_sapphire_pref.main(test, extracted_text)
-                    if test:
-                        print('\nTEST: csv created.')
                     return False
                 else:
                     print('Institution or statement not supported.\nPlease submit an issue and we\'ll get right to it.')
