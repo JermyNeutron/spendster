@@ -3,6 +3,7 @@ rep_statements/
 
 # Virtual Environment
 venv/
+main.dist/
 
 # Scratch Files
 find_line_in_text.py
