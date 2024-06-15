@@ -1,12 +1,38 @@
 Functions/
--- inst_pars
-    
+-- inst_pars.py
+     -- extraction_func | text
+     -- extraction_writing = .txt written
+     -- ident_inst | institution, document
+     -- main | institution, document   
 
-    Chase_Credit/
+-- chase_sapphire_pref.py
+     -- keyword_search | return index
+     -- find_month | return statement's month
+     -- month_rollback | statement's month as string
+     -- find_new_balance | return balance line
+     -- find_min_payment | return minimum payment line
+     -- find_available_points | return available points line
+     -- unpack_dict | return dictionary as writable string
+
+     // first page scrape
+
+     -- find_starting_dates | return dates, line, line differential
+          -- count_backward | determine differential
+          -- count_forward | return dates, line
+     -- find_starting_merchants | return merchants, line, reject counter
+          -- find_price_counter | return starting price line
+     -- find_starting_amounts | return prices, line
+     -- is_sp | return boolean if multiple transaction pages exist
+     -- find_addl_dates | 
+     -- find_addl_merchants |
+     -- find_addl_amounts | 
+     -- create_csv | creates csv
+     -- main | creates csv, no return
+
+
+-- chase_checking.py
 
 
 main.py
-    -- loc_ver (location verify)
-        -- pdf_drag_drop
-        -- extraction_func
-        -- extraction_writing
+    -- pdf_drag_drop | pdflink
+    -- main | chase_sapphire_pref.py
