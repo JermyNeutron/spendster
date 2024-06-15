@@ -1,9 +1,12 @@
 import sys
-import pdfminer
-import pdfminer.pdfparser
-from functions import inst_pars, chase_sapphire_pref
+import time
 
 sys.path.append('.')
+
+import pdfminer
+import pdfminer.pdfparser
+
+from functions import inst_pars, chase_sapphire_pref
 
 
 # PDF file drag and drop prompt.
@@ -35,14 +38,19 @@ def main(test):
             break
         try:
             try:
-                institution = inst_pars.main(test, pdflink)
+                institution, document = inst_pars.main(test, pdflink)
                 path = 'temp/temp_scrape.txt' if not test else 'temp/test_temp_scrape.txt'
                 with open(path, 'r') as file:
                     extracted_text = file.read()
                 # institution-specific analysis
                 if institution == 'Chase':
-                    chase_sapphire_pref.main(test, extracted_text)
-                    return False
+                    if document == 'Sapphire Preferred':
+                        chase_sapphire_pref.main(test, extracted_text)
+                        time.sleep(3)
+                        return False
+                    if document == 'Chase debit':
+                        time.sleep(3)
+                        raise Warning("Chase debit account still WIP")
                 else:
                     print('Institution or statement not supported.\nPlease submit an issue and we\'ll get right to it.')
             except pdfminer.pdfparser.PDFSyntaxError as e:
