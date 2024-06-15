@@ -121,6 +121,7 @@ def find_starting_dates(test):
                         counter += 2
                     else:
                         if test:
+                            print(find_starting_dates)
                             print(f"TEST: merchants start at {counter}")
                             print(f"TEST: first page's dates: {dates}")
                             print(f"TEST: array lenth: {len(dates)}")
@@ -166,7 +167,7 @@ def find_starting_merchants(test, merchant_counter, line_skip):
         line_skip = 0
     if test:
         print(find_starting_merchants)
-        print(f"\nTEST: starting variable {{test}}: {test}")
+        print(f"TEST: starting variable {{test}}: {test}")
         print(f"TEST: starting variable {{merchant_counter}}: {merchant_counter}")
         print(f"TEST: starting variable {{line_skip}}: {line_skip}")
     path = 'temp/temp_scrape.txt' if not test else 'temp/test_temp_scrape.txt'
@@ -367,7 +368,7 @@ def create_csv(test, export_text):
 # Main function of script.
 def main(test, extracted_text, stmt_essential_keys=stmt_essential_keys):
     if test:
-        print(f"\n\nTEST: {main} running...")
+        print(f"\n\nTEST: {main} running...\n")
     # Set up return statement.
     export_text = []
     stmt_essential_dict = {key: None for key in stmt_essential_keys}
@@ -412,3 +413,10 @@ if __name__ == '__main__':
     # create_csv(test, export_text)
     if test:
         print(f"TEST: {main} script completed.")
+
+
+'''
+Commit Comments:
+- 
+
+'''
