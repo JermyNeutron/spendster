@@ -46,6 +46,8 @@ def main(test):
                 if institution == 'Chase':
                     if document == 'Sapphire Preferred':
                         chase_sapphire_pref.main(test, extracted_text)
+                        if test:
+                            print(f"TEST: program sleeping...")
                         time.sleep(3)
                         return False
                     if document == 'Chase debit':
