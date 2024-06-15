@@ -32,12 +32,14 @@ stmt_monthrollback = {
 
 
 # Scrape document.
-def keyword_search(extracted_text, keyphrase):
+def keyword_search(test, extracted_text, keyphrase):
     lines = extracted_text.splitlines()
     for i, line in enumerate(lines):
         if keyphrase in line:
             # if there are 2 more lines of text, capture text
             if i + 2 < len(lines):
+                if test:
+                    print(f"TEST: returning {lines[i+2]}")
                 return lines[i+2].strip()
     return None
 
@@ -46,9 +48,9 @@ def keyword_search(extracted_text, keyphrase):
 
 
 # Find statement's month.
-def find_month(extracted_text):
+def find_month(test, extracted_text):
     keyphrase = 'SCENARIO-1D'
-    return_month = keyword_search(extracted_text,keyphrase)
+    return_month = keyword_search(test, extracted_text, keyphrase)
     return month_rollback(return_month)
 
 
@@ -62,21 +64,21 @@ def month_rollback(stmt_month=str):
 
 
 # Find statement's balance.
-def find_new_balance(extracted_text):
+def find_new_balance(test, extracted_text):
     keyphrase = 'New Balance'
-    return keyword_search(extracted_text,keyphrase)
+    return keyword_search(test, extracted_text, keyphrase)
 
 
 # Find statement's minimum payment.
-def find_min_payment(extracted_text):
+def find_min_payment(test, extracted_text):
     keyphrase = 'Minimum Payment Due:'
-    return keyword_search(extracted_text,keyphrase)
+    return keyword_search(test, extracted_text, keyphrase)
 
 
 # Find available reward points.
-def find_available_points(extracted_text):
+def find_available_points(test, extracted_text):
     keyphrase = 'redemption'
-    return keyword_search(extracted_text,keyphrase)
+    return keyword_search(test, extracted_text, keyphrase)
 
 
 # Unpack stmt_essential_dict items into csv
@@ -94,7 +96,7 @@ def find_starting_dates(test):
 
 
     # Count preceding dates to determine text gap to merchants
-    def count_backward(retro_counter):
+    def count_backward(test, retro_counter):
         line_skip = 0
         skip_array = []
         retro_counter -= 2
@@ -112,7 +114,7 @@ def find_starting_dates(test):
                         return line_skip
 
 
-    def count_forward(counter):
+    def count_forward(test, counter):
         while counter < len(extracted_text):
             for line_number, line in enumerate(extracted_text, start=1):
                 if line_number == counter:
@@ -144,8 +146,8 @@ def find_starting_dates(test):
             break
     dates = []
     date_pattern = re.compile(r'^\d{2}/\d{2}$')
-    line_skip = count_backward(retro_counter)
-    dates, counter = count_forward(counter)
+    line_skip = count_backward(test, retro_counter)
+    dates, counter = count_forward(test, counter)
     return dates, counter, line_skip
 
 
@@ -267,7 +269,7 @@ def is_sp(test):
 
 
 # Collect second page's transaction dates.
-def find_addl_dates1(test):
+def find_addl_dates(test):
     path = 'temp/temp_scrape.txt' if not test else 'temp/test_temp_scrape.txt'
     with open(path, 'r') as file:
         extracted_text = file.readlines()
@@ -291,13 +293,13 @@ def find_addl_dates1(test):
                         print(f"\nTEST: second page's merchants start at {counter}")
                         print(f"TEST: second page's dates: {dates}")
                         print(f"TEST: array length: {len(dates)}")
-                        print(f"TEST: {find_addl_dates1}: completed.")
+                        print(f"TEST: {find_addl_dates}: completed.")
                     return dates, counter, len(dates)
     return dates, counter
 
 
 # Collect second page's merchants.
-def find_addl_merchants1(test, sp_mercounter):
+def find_addl_merchants(test, sp_mercounter):
     path = 'temp/temp_scrape.txt' if not test else 'temp/test_temp_scrape.txt'
     with open(path, 'r') as file:
         extracted_text = file.readlines()
@@ -311,7 +313,7 @@ def find_addl_merchants1(test, sp_mercounter):
                     if test:
                         print(f"\nTEST: second pages merchants: {merchants}")
                         print(f"TEST: array length: {len(merchants)}")
-                        print(f"TEST: {find_addl_merchants1}: completed.")
+                        print(f"TEST: {find_addl_merchants}: completed.")
                     return merchants
                 merchants.append(line.strip())
                 counter += 2
@@ -319,7 +321,7 @@ def find_addl_merchants1(test, sp_mercounter):
 
 
 # Collect second page's amounts.
-def find_addl_amounts1(test, limit):
+def find_addl_amounts(test, limit):
     path = 'temp/temp_scrape.txt' if not test else 'temp/test_temp_scrape.txt'
     with open(path, 'r') as file:
         extracted_text = file.readlines()
@@ -340,7 +342,7 @@ def find_addl_amounts1(test, limit):
                         if test:
                             print(f"\nTEST: second page amounts: {price_amounts}")
                             print(f"TEST: array length: {len(price_amounts)}")
-                            print(f"TEST: {find_addl_amounts1}: completed.")
+                            print(f"TEST: {find_addl_amounts}: completed.")
                         return price_amounts
     return price_amounts
     # return amounts
@@ -373,10 +375,10 @@ def main(test, extracted_text, stmt_essential_keys=stmt_essential_keys):
     export_text = []
     stmt_essential_dict = {key: None for key in stmt_essential_keys}
     # Dictionary population functions.
-    stmt_essential_dict['month'] = " ".join((find_month(extracted_text)).split()) # Removes double space.
-    stmt_essential_dict['balance'] = (find_new_balance(extracted_text))
-    stmt_essential_dict['payment'] = (find_min_payment(extracted_text))
-    stmt_essential_dict['points'] = (find_available_points(extracted_text))
+    stmt_essential_dict['month'] = " ".join((find_month(test, extracted_text)).split()) # Removes double space.
+    stmt_essential_dict['balance'] = (find_new_balance(test, extracted_text))
+    stmt_essential_dict['payment'] = (find_min_payment(test, extracted_text))
+    stmt_essential_dict['points'] = (find_available_points(test, extracted_text))
     # Pack export_text to return.
     export_text.extend(unpack_dict(stmt_essential_dict))
     stmt_transactions = [('Dates', 'Merchants', 'Amount')]
@@ -385,9 +387,9 @@ def main(test, extracted_text, stmt_essential_keys=stmt_essential_keys):
     fp_prices, fp_endcounter = find_starting_amounts(test, fp_pricounter, fp_skipnum, fp_rejectcounter) # NORMAL: fp_endcounter not referenced anywhere
     stmt_transactions.extend(zip(fp_dates, fp_prices, fp_merchants))
     if is_sp(test):
-        sp_dates, sp_mercounter, sp_limit = find_addl_dates1(test)
-        sp_merchants = find_addl_merchants1(test, sp_mercounter)
-        sp_prices = find_addl_amounts1(test, sp_limit)
+        sp_dates, sp_mercounter, sp_limit = find_addl_dates(test)
+        sp_merchants = find_addl_merchants(test, sp_mercounter)
+        sp_prices = find_addl_amounts(test, sp_limit)
         stmt_transactions.extend(zip(sp_dates, sp_prices, sp_merchants))
         print('TEST: second page completed.')
     export_text.extend(stmt_transactions)
@@ -410,7 +412,6 @@ if __name__ == '__main__':
         path = option_1
     extracted_text = extraction_func(path)
     main(test, extracted_text)
-    # create_csv(test, export_text)
     if test:
         print(f"TEST: {main} script completed.")
 
