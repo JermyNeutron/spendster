@@ -382,12 +382,12 @@ def main(test, extracted_text, stmt_essential_keys=stmt_essential_keys):
     fp_dates, fp_mercounter, fp_skipnum = find_starting_dates(test)
     fp_merchants, fp_pricounter, fp_rejectcounter = find_starting_merchants(test, fp_mercounter, fp_skipnum)
     fp_prices, fp_endcounter = find_starting_amounts(test, fp_pricounter, fp_skipnum, fp_rejectcounter) # NORMAL: fp_endcounter not referenced anywhere
-    stmt_transactions.extend(zip(fp_dates, fp_merchants, fp_prices))
+    stmt_transactions.extend(zip(fp_dates, fp_prices, fp_merchants))
     if is_sp(test):
         sp_dates, sp_mercounter, sp_limit = find_addl_dates1(test)
         sp_merchants = find_addl_merchants1(test, sp_mercounter)
         sp_prices = find_addl_amounts1(test, sp_limit)
-        stmt_transactions.extend(zip(sp_dates, sp_merchants, sp_prices))
+        stmt_transactions.extend(zip(sp_dates, sp_prices, sp_merchants))
         print('TEST: second page completed.')
     export_text.extend(stmt_transactions)
     # [Balance, Minimum Payment, Reward Points]
