@@ -31,21 +31,33 @@ def find_month(test, extracted_text):
     for i, month in months_dict.items():
         if var_month == month: # Redundant check of successful scrape
             if test:
-                print(f"TEST: returning month {i}: {month}")
+                print(f"TEST: returning month {{{i}}}: {month}")
             return f"{var_month} {var_year}", return_text
     return None
 
 
 def find_ending_balance(test, extracted_text):
-    keyphrase = "Ending Balance\n"
-    print(f"keyphrase: {keyphrase}")
-    for i, line in enumerate(extracted_text, start=1):
+    keyphrase = "Ending Balance"
+    occurences = []
+    # Find the line number for the keyphrase
+    for i, line in enumerate(extracted_text.split('\n'), start=1):
         if keyphrase == line.strip():
-            print(f"{find_ending_balance}: {i}, {line}")
+            if test:
+                print(f"TEST: {find_ending_balance}: {i}, {line}")
+            occurences.append(i)
+    # Find next line after keyphrase to return statement ending balance
+    counter = occurences.pop(0) + 2
+    for i, line in enumerate(extracted_text.split('\n'), start=1):
+        if counter == i:
+            print(f"TEST: returning balance: {line}")
+            return line
+
 
 
 def main(test, extracted_text):
     # Collecting CSV headers
+    if test:
+        print(F"TEST: statement CSV headers")
     stmt_essential_keys = ['month', 'period', 'balance',]
     stmt_essential_dict = {key: None for key in stmt_essential_keys}
     stmt_essential_dict['month'], stmt_essential_dict['period'] = find_month(test, extracted_text)
