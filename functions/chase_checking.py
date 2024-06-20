@@ -31,10 +31,10 @@ def keyword_search(test, extracted_text, keyphrase):
     lines = extracted_text
     for i, line in enumerate(lines):
         if keyphrase in line:
-            if i + 2 < len(lines):
+            if i + 1 < len(lines):
                 if test:
-                    print(f"TEST: returning keyword_search: {lines[i+2]}")
-                return lines[i+2]
+                    print(f"TEST: returning keyword_search: {lines[i+1]}")
+                return lines[i+1]
     return None
 
 
@@ -61,7 +61,7 @@ def find_ending_balance(test, extracted_text):
                 print(f"TEST: {find_ending_balance}: {i}, {line.strip()}")
             occurences.append(i)
     # Find next line after keyphrase to return statement ending balance
-    counter = occurences.pop(0) + 2
+    counter = occurences.pop(0) + 1
     for i, line in enumerate(extracted_text, start=1): #
         if counter == i:
             print(f"TEST: returning balance: {line}")
@@ -78,7 +78,9 @@ def find_starting_transactions(test, extracted_text):
             if test:
                 print(f"TEST: {find_starting_transactions}: {i}, {line.strip()}")
             occurences.append(i)
-    counter = occurences.pop() + 4
+    counter = occurences.pop() + 2
+    if test:
+        print(f"TEST: transactions start: {counter}")
     for i, line in enumerate(extracted_text, start=1): #
         if counter == i:
             for i in range(counter, len(extracted_text), 3):
@@ -91,7 +93,14 @@ def find_starting_transactions(test, extracted_text):
 def find_adl_transactions(test, extracted_text):
     # *start*transaction detail, if x2 = 2nd page exists
     # *end*transaction detail stop
-    pass
+    sp_ind = "*start*transaction detail"
+    sp_ind_occurence = []
+    for i, line in enumerate(extracted_text, start=1):
+        if sp_ind == line:
+            sp_ind_occurence.append(i)
+    if len(sp_ind_occurence) <= 2:
+        sp_counter = sp_ind_occurence.pop()
+    print(f"TEST: Second Page counter starts: {sp_counter+7}")
 
 
 def main(test, extracted_text, stmt_essential_keys=stmt_essential_keys):
@@ -106,6 +115,7 @@ def main(test, extracted_text, stmt_essential_keys=stmt_essential_keys):
     stmt_essential_dict['month'], stmt_essential_dict['period'] = find_month(test, extracted_text)
     stmt_essential_dict['balance'] = find_ending_balance(test, extracted_text)
     find_starting_transactions(test, extracted_text)
+    find_adl_transactions(test, extracted_text)
 
 
 if __name__ == '__main__':
