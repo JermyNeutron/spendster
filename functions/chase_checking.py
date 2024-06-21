@@ -9,7 +9,7 @@ sys.path.append('.')
 import pyperclip
 
 from functions.inst_pars import extraction_func
-from calendar_months import months_dict 
+from .calendar_months import months_dict # preceding '.' for main.py execution
 
 
 # Dictionary keys to return.
@@ -29,13 +29,12 @@ class Transaction:
 
 # Centralized keyword scraping function.
 def keyword_search(hints_enabled, extracted_text, keyphrase):
-    lines = extracted_text
-    for i, line in enumerate(lines):
+    for i, line in enumerate(extracted_text):
         if keyphrase in line:
-            if i + 1 < len(lines):
+            if i + 1 < len(extracted_text):
                 if hints_enabled:
-                    print(f"HINT: Returning keyword_search: {lines[i+1]}")
-                return lines[i+1]
+                    print(f"HINT: Returning keyword_search: {extracted_text[i+1]}")
+                return extracted_text[i+1]
     return None
 
 
@@ -48,7 +47,7 @@ def find_month(hints_enabled, extracted_text):
     for i, month in months_dict.items():
         if var_month == month: # Redundant check of successful scrape.
             if hints_enabled:
-                print(f"HINT: Returning month {{{i}}}: {month}")
+                print(f"HINT: Returning month {{{i}}}: {month} {var_year}")
             return f"{var_month} {var_year}", return_text
     return None
 
@@ -59,7 +58,7 @@ def find_ending_balance(hints_enabled, extracted_text):
     occurences = []
     # Find line number for keyphrase.
     for i, line in enumerate(extracted_text, start=1):
-        if keyphrase == line.strip():
+        if keyphrase in line:
             if hints_enabled:
                 print(f"HINT: {find_ending_balance}: {i}, {line.strip()}")
             occurences.append(i)
@@ -78,9 +77,10 @@ def unpack_dict(hints_enabled, stmt_essential_dict: dict):
     for key, value in stmt_essential_dict.items():
         keyval_pair.append((key, value))
     if hints_enabled:
-        print('\nHINT: ', unpack_dict)
+        print('\nHINT:',unpack_dict)
         for i in keyval_pair:
             print('HINT: unpacking', i)
+    print() # white space
     return keyval_pair
 
 
@@ -88,12 +88,12 @@ def unpack_dict(hints_enabled, stmt_essential_dict: dict):
 def transaction_scrape(hints_enabled, extracted_text, counter, end_phrase):
     date_format = re.compile(r'^\d{2}/\d{2}$')
     transactions_arr = []
-    for i in range(0, len(extracted_text) + 1):
+    for i in range(1, len(extracted_text) + 1):
         if i == counter:
             j = counter - 1
             while j < len(extracted_text):
                 if j + 3 < len(extracted_text):
-                    if extracted_text[j].strip() != end_phrase:
+                    if end_phrase not in extracted_text[j].strip():
                         # If [j] is a misc line to be skipped
                         if not date_format.match(extracted_text[j].strip()):
                             j += 1
@@ -122,9 +122,9 @@ def find_starting_transactions(hints_enabled, extracted_text):
     occurences = []
     # find line number for keyphrase.
     for i, line in enumerate(extracted_text, start=1):
-        if keyphrase == line.strip():
+        if keyphrase in line.strip():
             if hints_enabled:
-                print(f"\nHINT: {find_starting_transactions}: {i}, {line.strip()}")
+                print(f"HINT: {find_starting_transactions}: {i}, {line}")
             occurences.append(i)
     counter = occurences.pop() + 2
     if hints_enabled:
@@ -184,11 +184,9 @@ def create_csv(test, hints_enabled, export_text):
 
 
 # Main function of script.
-def main(test: bool, hints_enabled: bool, extracted_text: str, stmt_essential_keys=stmt_essential_keys):
+def main(test: bool, hints_enabled: bool, extracted_text: list[str], stmt_essential_keys=stmt_essential_keys):
     # Collecting CSV headers.
-    path = 'temp/test_scrape.txt' if not test else 'temp/test_temp_scrape.txt'
     export_text = []
-    extracted_text = [item for item in extracted_text.split('\n') if item != ''] # Chase Checking text requires .split('\n).
     if hints_enabled:
         print('\nHINT:', main)
         print(F"HINT: Statement CSV headers")
@@ -210,9 +208,10 @@ if __name__ == '__main__':
     test = True
     hints_enabled = True
     # path = 'rep_statements/20240320-statements-9266-.pdf'
-    path = 'rep_statements/20240418-statements-9266-.pdf'
+    path = 'rep_statements/20240320-statements-9266-.pdf'
     with open(path, 'r', encoding="utf-8", errors="replace") as file:
-        extracted_text = extraction_func(path)
+        text = extraction_func(path)
+    extracted_text = [item for item in text.split('\n') if item != '']
     main(test, hints_enabled, extracted_text)
 
 
