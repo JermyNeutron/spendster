@@ -9,7 +9,7 @@ sys.path.append('.')
 import pyperclip
 
 from functions.inst_pars import extraction_func
-from calendar_months import months_dict
+from .calendar_months import months_dict # preceding '.' for main.py execution
 
 
 # Dictionary keys to return.
