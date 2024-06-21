@@ -67,9 +67,9 @@ def find_available_points(test, extracted_text):
 
 
 # Unpack stmt_essential_dict items into csv
-def unpack_dict(stmt_essential_dic: dict):
+def unpack_dict(stmt_essential_dict: dict):
     keyval_pair = []
-    for key, value in stmt_essential_dic.items():
+    for key, value in stmt_essential_dict.items():
         keyval_pair.append((key, value))
     return keyval_pair
 
