@@ -149,7 +149,7 @@ def is_adl(hints_enabled, extracted_text):
         sp_bool = True
         sp_counter = sp_ind_occurence.pop() + 7
         return sp_bool, sp_counter
-    return sp_bool
+    return sp_bool, None
 
 
 # Scrape second page's transactions.
@@ -197,6 +197,7 @@ def main(test: bool, hints_enabled: bool, extracted_text: str, stmt_essential_ke
     stmt_essential_dict['balance'] = find_ending_balance(hints_enabled, extracted_text)
     export_text.extend(unpack_dict(hints_enabled, stmt_essential_dict))
     transaction_arr: list[str] = find_starting_transactions(hints_enabled, extracted_text)
+    export_text.extend(transaction_arr)
     adl_exit, sp_counter = is_adl(hints_enabled, extracted_text)
     if adl_exit:
         transaction_arr.extend(find_adl_transactions(hints_enabled, extracted_text, sp_counter))
@@ -208,7 +209,8 @@ def main(test: bool, hints_enabled: bool, extracted_text: str, stmt_essential_ke
 if __name__ == '__main__':
     test = True
     hints_enabled = True
-    path = 'rep_statements/20240320-statements-9266-.pdf'
+    # path = 'rep_statements/20240320-statements-9266-.pdf'
+    path = 'rep_statements/20240418-statements-9266-.pdf'
     with open(path, 'r', encoding="utf-8", errors="replace") as file:
         extracted_text = extraction_func(path)
     main(test, hints_enabled, extracted_text)
