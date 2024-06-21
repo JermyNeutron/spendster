@@ -15,6 +15,7 @@ test_temp_scrape.txt
 test_temp.csv
 
 # VS Code workspace
+spendster.code-workspace
 spendster_workspace.code-workspace
 
 # Python
