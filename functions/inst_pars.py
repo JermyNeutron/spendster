@@ -21,7 +21,8 @@ def extraction_func(path):
 # Write the extracted text to temp file.
 def extraction_writing(test, text):
     path = 'temp/temp_scrape.txt' if not test else 'temp/test_temp_scrape.txt'
-    with open(path, 'w') as file:
+    # print(text)
+    with open(path, 'w', encoding="utf-8", errors="replace") as file:
         file.write(text)
 
 
@@ -31,7 +32,7 @@ def ident_inst(test, extracted_text):
         for keyword in keywords:
             if keyword in extracted_text:
                 if test:
-                    print(f"TESt: {{inst}}: {inst}")
+                    print(f"TEST: {{inst}}: {inst}")
                     print(f"TEST: {{keyword}}: {keyword}")
                 return inst, keyword
 
