@@ -33,7 +33,7 @@ def keyword_search(test, hints_enabled, extracted_text, keyphrase):
         if keyphrase in line:
             if i + 1 < len(lines):
                 if hints_enabled:
-                    print(f"HINT: returning keyword_search: {lines[i+1]}")
+                    print(f"HINT: Returning keyword_search: {lines[i+1]}")
                 return lines[i+1]
     return None
 
@@ -46,7 +46,7 @@ def find_month(test, hints_enabled, extracted_text):
     for i, month in months_dict.items():
         if var_month == month: # Redundant check of successful scrape
             if hints_enabled:
-                print(f"HINT: returning month {{{i}}}: {month}")
+                print(f"HINT: Returning month {{{i}}}: {month}")
             return f"{var_month} {var_year}", return_text
     return None
 
@@ -65,13 +65,14 @@ def find_ending_balance(test, hints_enabled, extracted_text):
     for i, line in enumerate(extracted_text, start=1): #
         if counter == i:
             if hints_enabled:
-                print(f"HINT: returning balance: {line}")
+                print(f"HINT: Returning balance: {line}")
             return line.strip()
 
 
 def find_starting_transactions(test, hints_enabled, extracted_text):
     keyphrase = "Beginning Balance"
     end_phrase = "*end*transaction detail"
+    date_format = re.compile(r'^\d{2}/\d{2}$')
     occurences = []
     # find line number for keyphrase
     for i, line in enumerate(extracted_text, start=1): #
@@ -81,11 +82,36 @@ def find_starting_transactions(test, hints_enabled, extracted_text):
             occurences.append(i)
     counter = occurences.pop() + 2
     if hints_enabled:
-        print(f"HINT: transactions start: {counter}")
-    for i, line in enumerate(extracted_text, start=1): #
-        if counter == i:
-            for i in range(counter, len(extracted_text), 3):
-                pass
+        print('\nHINT:', find_starting_transactions)
+        print(f"HINT: Transactions start: {counter}")
+    transactions_arr = []
+    for i, line in enumerate(extracted_text, start=1):
+        if i == counter:
+            j = counter - 1
+            while j < len(extracted_text):
+                if j + 3 < len(extracted_text):
+                    if extracted_text[j].strip() != end_phrase:
+                        if not date_format.match(extracted_text[j].strip()):
+                            j += 1
+                            continue
+                        else:
+                            trx_date = extracted_text[j].strip()
+                            pre_trx_merchant = extracted_text[j + 1].strip()
+                            trx_merchant = ' '.join(pre_trx_merchant.split())
+                            trx_amount = extracted_text[j + 2].strip()
+                            transaction_ind = (trx_date, trx_merchant, trx_amount)
+                            transactions_arr.append(transaction_ind)
+                            if hints_enabled:
+                                print(f"HINT: {trx_date}, {trx_merchant}, {trx_amount}")
+                            j += 4
+                    else:
+                        if hints_enabled:
+                            print(f"HINT: Ending phrase met: {j - 1}: {extracted_text[j]}")
+                        return transactions_arr
+
+    
+    return transactions_arr
+
     # Date, Merchant, Transaction
     # +4 to repeat
     # *end*transaction detail stop
@@ -102,7 +128,8 @@ def find_adl_transactions(test, hints_enabled, extracted_text):
     if len(sp_ind_occurence) <= 2:
         sp_counter = sp_ind_occurence.pop()
     if hints_enabled:
-        print(f"HINT: Second Page counter starts: {sp_counter+7}")
+        print('\nHINT:', find_adl_transactions)
+        print(f"HINT: Second page counter starts: {sp_counter+7}")
 
 
 def main(test, hints_enabled, extracted_text, stmt_essential_keys=stmt_essential_keys):
@@ -113,7 +140,8 @@ def main(test, hints_enabled, extracted_text, stmt_essential_keys=stmt_essential
         for item in extracted_text:
             file.write(f"{str(item)}\n")
     if hints_enabled:
-        print(F"HINT: statement CSV headers")
+        print('\nHINT:', main)
+        print(F"HINT: Statement CSV headers")
     stmt_essential_dict = {key: None for key in stmt_essential_keys}
     stmt_essential_dict['month'], stmt_essential_dict['period'] = find_month(test, hints_enabled, extracted_text)
     stmt_essential_dict['balance'] = find_ending_balance(test, hints_enabled, extracted_text)
