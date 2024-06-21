@@ -27,6 +27,7 @@ class Transaction:
         return f"Transaction({{{self.date}}}={self.date}, {{{self.merchant}}}={self.merchant}, {{{self.amount}}}={self.amount})"
 
 
+# Centralized keyword scraping function.
 def keyword_search(test, hints_enabled, extracted_text, keyphrase):
     lines = extracted_text
     for i, line in enumerate(lines):
@@ -38,6 +39,7 @@ def keyword_search(test, hints_enabled, extracted_text, keyphrase):
     return None
 
 
+# Find statement's month.
 def find_month(test, hints_enabled, extracted_text):
     keyphrase = 'Columbus, OH 43218 - 2051'
     return_text = keyword_search(test, hints_enabled, extracted_text, keyphrase)
@@ -51,6 +53,7 @@ def find_month(test, hints_enabled, extracted_text):
     return None
 
 
+# Collect statement ending balance.
 def find_ending_balance(test, hints_enabled, extracted_text):
     keyphrase = "Ending Balance"
     occurences = []
@@ -69,6 +72,7 @@ def find_ending_balance(test, hints_enabled, extracted_text):
             return line.strip()
 
 
+# Centralized scraping function.
 def transaction_scrape(test, hints_enabled, extracted_text, counter, end_phrase):
     date_format = re.compile(r'^\d{2}/\d{2}$')
     transactions_arr = []
@@ -99,6 +103,7 @@ def transaction_scrape(test, hints_enabled, extracted_text, counter, end_phrase)
     return transactions_arr
 
 
+# Collect first page transactions.
 def find_starting_transactions(test, hints_enabled, extracted_text):
     keyphrase = "Beginning Balance"
     end_phrase = "*end*transaction detail"
@@ -116,6 +121,7 @@ def find_starting_transactions(test, hints_enabled, extracted_text):
     return transaction_scrape(test, hints_enabled, extracted_text, counter, end_phrase)
 
 
+# Determine if second page transactions exist.
 def is_adl(test, hints_enabled, extracted_text):
     sp_ind = "*start*transaction detail"
     sp_bool = False
@@ -134,6 +140,7 @@ def is_adl(test, hints_enabled, extracted_text):
     return sp_bool
 
 
+# Scrape second page's transactions.
 def find_adl_transactions(test, hints_enabled, extracted_text, sp_counter):
     end_phrase = '*end*transaction detail'
     if hints_enabled:
@@ -142,6 +149,29 @@ def find_adl_transactions(test, hints_enabled, extracted_text, sp_counter):
     return transaction_scrape(test, hints_enabled, extracted_text, sp_counter, end_phrase)
 
 
+# Pack and write organized data in to CSV.
+def create_csv(test, hints_enabled, export_text):
+    path = 'temp/temp.csv' if not test else 'temp/test_temp.csv'
+    with open(path, mode='w', newline='') as file: # writes CSV
+        writer = csv.writer(file)
+        writer.writerows(export_text)
+        if hints_enabled:
+            print('\nHINT: CSV created.')
+    with open(path, 'r', newline='') as file:
+        csv_data = list(csv.reader(file))
+        formatted_data = '\n'.join('\t'.join(row) for row in csv_data)
+        pyperclip.copy(formatted_data)
+        print("CSV content has been copied to clipboard. You can now paste it using CTRL+V.")
+    if test: # converts type list into string to write into .txt
+        csv_view = 'temp/test_csv_view.txt'
+        with open(csv_view, 'w') as file:
+            for item in export_text:
+                file.write(f"{str(item)}\n")
+        if hints_enabled:
+            print('HINT: CSV view created...')
+
+
+# Main function of script.
 def main(test: bool, hints_enabled: bool, extracted_text: str, stmt_essential_keys=stmt_essential_keys):
     # Collecting CSV headers
     path = 'temp/test_scrape.txt' if not test else 'temp/test_temp_scrape.txt'
@@ -156,7 +186,7 @@ def main(test: bool, hints_enabled: bool, extracted_text: str, stmt_essential_ke
     adl_exit, sp_counter = is_adl(test, hints_enabled, extracted_text)
     if adl_exit:
         transaction_arr.extend(find_adl_transactions(test, hints_enabled, extracted_text, sp_counter))
-    # need create csv, import function
+    create_csv(test, hints_enabled, transaction_arr)
 
 
 if __name__ == '__main__':
