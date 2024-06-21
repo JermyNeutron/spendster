@@ -16,7 +16,7 @@ from calendar_months import months_dict
 stmt_essential_keys = ['month', 'period', 'balance',]
 
 
-# Transaction class
+# Transaction class (currently UNUSED).
 class Transaction:
     def __init__(self, date, merchant, amount) -> None:
         self.date = date
@@ -28,7 +28,7 @@ class Transaction:
 
 
 # Centralized keyword scraping function.
-def keyword_search(test, hints_enabled, extracted_text, keyphrase):
+def keyword_search(hints_enabled, extracted_text, keyphrase):
     lines = extracted_text
     for i, line in enumerate(lines):
         if keyphrase in line:
@@ -40,13 +40,13 @@ def keyword_search(test, hints_enabled, extracted_text, keyphrase):
 
 
 # Find statement's month.
-def find_month(test, hints_enabled, extracted_text):
+def find_month(hints_enabled, extracted_text):
     keyphrase = 'Columbus, OH 43218 - 2051'
-    return_text = keyword_search(test, hints_enabled, extracted_text, keyphrase)
+    return_text = keyword_search(hints_enabled, extracted_text, keyphrase)
     return_text_split = return_text.split(' ')
     var_month, var_year = return_text_split[-3], return_text_split[-1]
     for i, month in months_dict.items():
-        if var_month == month: # Redundant check of successful scrape
+        if var_month == month: # Redundant check of successful scrape.
             if hints_enabled:
                 print(f"HINT: Returning month {{{i}}}: {month}")
             return f"{var_month} {var_year}", return_text
@@ -54,26 +54,38 @@ def find_month(test, hints_enabled, extracted_text):
 
 
 # Collect statement ending balance.
-def find_ending_balance(test, hints_enabled, extracted_text):
+def find_ending_balance(hints_enabled, extracted_text):
     keyphrase = "Ending Balance"
     occurences = []
-    # Find line number for keyphrase
-    for i, line in enumerate(extracted_text, start=1): #
+    # Find line number for keyphrase.
+    for i, line in enumerate(extracted_text, start=1):
         if keyphrase == line.strip():
             if hints_enabled:
                 print(f"HINT: {find_ending_balance}: {i}, {line.strip()}")
             occurences.append(i)
-    # Find next line after keyphrase to return statement ending balance
+    # Find next line after keyphrase to return statement ending balance.
     counter = occurences.pop(0) + 1
-    for i, line in enumerate(extracted_text, start=1): #
+    for i, line in enumerate(extracted_text, start=1):
         if counter == i:
             if hints_enabled:
                 print(f"HINT: Returning balance: {line}")
             return line.strip()
 
 
+# Unpack stmt_esential_dict items into CSV.
+def unpack_dict(hints_enabled, stmt_essential_dict: dict):
+    keyval_pair = []
+    for key, value in stmt_essential_dict.items():
+        keyval_pair.append((key, value))
+    if hints_enabled:
+        print('\nHINT: ', unpack_dict)
+        for i in keyval_pair:
+            print('HINT: unpacking', i)
+    return keyval_pair
+
+
 # Centralized scraping function.
-def transaction_scrape(test, hints_enabled, extracted_text, counter, end_phrase):
+def transaction_scrape(hints_enabled, extracted_text, counter, end_phrase):
     date_format = re.compile(r'^\d{2}/\d{2}$')
     transactions_arr = []
     for i in range(0, len(extracted_text) + 1):
@@ -104,25 +116,25 @@ def transaction_scrape(test, hints_enabled, extracted_text, counter, end_phrase)
 
 
 # Collect first page transactions.
-def find_starting_transactions(test, hints_enabled, extracted_text):
+def find_starting_transactions(hints_enabled, extracted_text):
     keyphrase = "Beginning Balance"
     end_phrase = "*end*transaction detail"
     occurences = []
-    # find line number for keyphrase
-    for i, line in enumerate(extracted_text, start=1): #
+    # find line number for keyphrase.
+    for i, line in enumerate(extracted_text, start=1):
         if keyphrase == line.strip():
             if hints_enabled:
-                print(f"HINT: {find_starting_transactions}: {i}, {line.strip()}")
+                print(f"\nHINT: {find_starting_transactions}: {i}, {line.strip()}")
             occurences.append(i)
     counter = occurences.pop() + 2
     if hints_enabled:
         print('\nHINT:', find_starting_transactions)
         print(f"HINT: Transactions start: {counter}")
-    return transaction_scrape(test, hints_enabled, extracted_text, counter, end_phrase)
+    return transaction_scrape(hints_enabled, extracted_text, counter, end_phrase)
 
 
 # Determine if second page transactions exist.
-def is_adl(test, hints_enabled, extracted_text):
+def is_adl(hints_enabled, extracted_text):
     sp_ind = "*start*transaction detail"
     sp_bool = False
     sp_ind_occurence = []
@@ -141,18 +153,18 @@ def is_adl(test, hints_enabled, extracted_text):
 
 
 # Scrape second page's transactions.
-def find_adl_transactions(test, hints_enabled, extracted_text, sp_counter):
+def find_adl_transactions(hints_enabled, extracted_text, sp_counter):
     end_phrase = '*end*transaction detail'
     if hints_enabled:
         print('\nHINT:', find_adl_transactions)
         print(f"HINT: Second page counter starts: {sp_counter}")
-    return transaction_scrape(test, hints_enabled, extracted_text, sp_counter, end_phrase)
+    return transaction_scrape(hints_enabled, extracted_text, sp_counter, end_phrase)
 
 
 # Pack and write organized data in to CSV.
 def create_csv(test, hints_enabled, export_text):
     path = 'temp/temp.csv' if not test else 'temp/test_temp.csv'
-    with open(path, mode='w', newline='') as file: # writes CSV
+    with open(path, mode='w', newline='') as file: # writes CSV.
         writer = csv.writer(file)
         writer.writerows(export_text)
         if hints_enabled:
@@ -162,7 +174,7 @@ def create_csv(test, hints_enabled, export_text):
         formatted_data = '\n'.join('\t'.join(row) for row in csv_data)
         pyperclip.copy(formatted_data)
         print("CSV content has been copied to clipboard. You can now paste it using CTRL+V.")
-    if test: # converts type list into string to write into .txt
+    if test: # converts type list into string to write into .txt.
         csv_view = 'temp/test_csv_view.txt'
         with open(csv_view, 'w') as file:
             for item in export_text:
@@ -173,20 +185,24 @@ def create_csv(test, hints_enabled, export_text):
 
 # Main function of script.
 def main(test: bool, hints_enabled: bool, extracted_text: str, stmt_essential_keys=stmt_essential_keys):
-    # Collecting CSV headers
+    # Collecting CSV headers.
     path = 'temp/test_scrape.txt' if not test else 'temp/test_temp_scrape.txt'
-    extracted_text = [item for item in extracted_text.split('\n') if item != ''] # Chase Checking text requires .split('\n)
+    export_text = []
+    extracted_text = [item for item in extracted_text.split('\n') if item != ''] # Chase Checking text requires .split('\n).
     if hints_enabled:
         print('\nHINT:', main)
         print(F"HINT: Statement CSV headers")
     stmt_essential_dict = {key: None for key in stmt_essential_keys}
-    stmt_essential_dict['month'], stmt_essential_dict['period'] = find_month(test, hints_enabled, extracted_text)
-    stmt_essential_dict['balance'] = find_ending_balance(test, hints_enabled, extracted_text)
-    transaction_arr: list[str] = find_starting_transactions(test, hints_enabled, extracted_text)
-    adl_exit, sp_counter = is_adl(test, hints_enabled, extracted_text)
+    stmt_essential_dict['month'], stmt_essential_dict['period'] = find_month(hints_enabled, extracted_text)
+    stmt_essential_dict['balance'] = find_ending_balance(hints_enabled, extracted_text)
+    export_text.extend(unpack_dict(hints_enabled, stmt_essential_dict))
+    transaction_arr: list[str] = find_starting_transactions(hints_enabled, extracted_text)
+    adl_exit, sp_counter = is_adl(hints_enabled, extracted_text)
     if adl_exit:
-        transaction_arr.extend(find_adl_transactions(test, hints_enabled, extracted_text, sp_counter))
-    create_csv(test, hints_enabled, transaction_arr)
+        transaction_arr.extend(find_adl_transactions(hints_enabled, extracted_text, sp_counter))
+        export_text.extend(transaction_arr)
+    
+    create_csv(test, hints_enabled, export_text)
 
 
 if __name__ == '__main__':
