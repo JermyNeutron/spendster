@@ -3,9 +3,14 @@ A quick way to scrape your bank and credit card statements for your own personal
 
 >[!WARNING]
 > As of 06/20/2024, these are the only supported statements:
-> - Chase Sapphire Preferred (up to 2 transaction pages, card payments/credits not included)
+>
+> **Checking Accounts**
 > - Chase Checking (up to 2 transaction pages)
-> - SchoolsFirst Credit Union (WIP)
+> - SchoolsFirst Credit Union Checking (WIP)
+>
+> **Credit Cards**
+> - Chase Sapphire Preferred (up to 2 transaction pages, card payments/credits not included)
+> - SchoolsFirst Credit Union Credit (WIP)
 >
 > This will be updated as additional statements and institutions are prepared. 
 
