@@ -69,28 +69,16 @@ def find_ending_balance(test, hints_enabled, extracted_text):
             return line.strip()
 
 
-def find_starting_transactions(test, hints_enabled, extracted_text):
-    keyphrase = "Beginning Balance"
-    end_phrase = "*end*transaction detail"
+def transaction_scrape(test, hints_enabled, extracted_text, counter, end_phrase):
     date_format = re.compile(r'^\d{2}/\d{2}$')
-    occurences = []
-    # find line number for keyphrase
-    for i, line in enumerate(extracted_text, start=1): #
-        if keyphrase == line.strip():
-            if hints_enabled:
-                print(f"HINT: {find_starting_transactions}: {i}, {line.strip()}")
-            occurences.append(i)
-    counter = occurences.pop() + 2
-    if hints_enabled:
-        print('\nHINT:', find_starting_transactions)
-        print(f"HINT: Transactions start: {counter}")
     transactions_arr = []
-    for i, line in enumerate(extracted_text, start=1):
+    for i in range(0, len(extracted_text) + 1):
         if i == counter:
             j = counter - 1
             while j < len(extracted_text):
                 if j + 3 < len(extracted_text):
                     if extracted_text[j].strip() != end_phrase:
+                        # If [j] is a misc line to be skipped
                         if not date_format.match(extracted_text[j].strip()):
                             j += 1
                             continue
@@ -106,47 +94,69 @@ def find_starting_transactions(test, hints_enabled, extracted_text):
                             j += 4
                     else:
                         if hints_enabled:
-                            print(f"HINT: Ending phrase met: {j - 1}: {extracted_text[j]}")
+                            print(f"HINT: Ending phrase met: {j - 1}: \"{extracted_text[j]}\"")
                         return transactions_arr
-
-    
     return transactions_arr
 
-    # Date, Merchant, Transaction
-    # +4 to repeat
-    # *end*transaction detail stop
+
+def find_starting_transactions(test, hints_enabled, extracted_text):
+    keyphrase = "Beginning Balance"
+    end_phrase = "*end*transaction detail"
+    occurences = []
+    # find line number for keyphrase
+    for i, line in enumerate(extracted_text, start=1): #
+        if keyphrase == line.strip():
+            if hints_enabled:
+                print(f"HINT: {find_starting_transactions}: {i}, {line.strip()}")
+            occurences.append(i)
+    counter = occurences.pop() + 2
+    if hints_enabled:
+        print('\nHINT:', find_starting_transactions)
+        print(f"HINT: Transactions start: {counter}")
+    return transaction_scrape(test, hints_enabled, extracted_text, counter, end_phrase)
 
 
-def find_adl_transactions(test, hints_enabled, extracted_text):
-    # *start*transaction detail, if x2 = 2nd page exists
-    # *end*transaction detail stop
+def is_adl(test, hints_enabled, extracted_text):
     sp_ind = "*start*transaction detail"
+    sp_bool = False
     sp_ind_occurence = []
     for i, line in enumerate(extracted_text, start=1):
         if sp_ind == line:
             sp_ind_occurence.append(i)
-    if len(sp_ind_occurence) <= 2:
-        sp_counter = sp_ind_occurence.pop()
+    if len(sp_ind_occurence) >= 2:
+        if hints_enabled:
+            print('\nHINT: ', is_adl)
+            for i in sp_ind_occurence:
+                print(f"HINT: \"{sp_ind}\" found at {i}")
+        sp_bool = True
+        sp_counter = sp_ind_occurence.pop() + 7
+        return sp_bool, sp_counter
+    return sp_bool
+
+
+def find_adl_transactions(test, hints_enabled, extracted_text, sp_counter):
+    end_phrase = '*end*transaction detail'
     if hints_enabled:
         print('\nHINT:', find_adl_transactions)
-        print(f"HINT: Second page counter starts: {sp_counter+7}")
+        print(f"HINT: Second page counter starts: {sp_counter}")
+    return transaction_scrape(test, hints_enabled, extracted_text, sp_counter, end_phrase)
 
 
-def main(test, hints_enabled, extracted_text, stmt_essential_keys=stmt_essential_keys):
+def main(test: bool, hints_enabled: bool, extracted_text: str, stmt_essential_keys=stmt_essential_keys):
     # Collecting CSV headers
     path = 'temp/test_scrape.txt' if not test else 'temp/test_temp_scrape.txt'
     extracted_text = [item for item in extracted_text.split('\n') if item != ''] # Chase Checking text requires .split('\n)
-    with open(path, 'w', encoding='utf-8', errors='replace') as file: # removable
-        for item in extracted_text:
-            file.write(f"{str(item)}\n")
     if hints_enabled:
         print('\nHINT:', main)
         print(F"HINT: Statement CSV headers")
     stmt_essential_dict = {key: None for key in stmt_essential_keys}
     stmt_essential_dict['month'], stmt_essential_dict['period'] = find_month(test, hints_enabled, extracted_text)
     stmt_essential_dict['balance'] = find_ending_balance(test, hints_enabled, extracted_text)
-    find_starting_transactions(test, hints_enabled, extracted_text)
-    find_adl_transactions(test, hints_enabled, extracted_text)
+    transaction_arr: list[str] = find_starting_transactions(test, hints_enabled, extracted_text)
+    adl_exit, sp_counter = is_adl(test, hints_enabled, extracted_text)
+    if adl_exit:
+        transaction_arr.extend(find_adl_transactions(test, hints_enabled, extracted_text, sp_counter))
+    # need create csv, import function
 
 
 if __name__ == '__main__':
