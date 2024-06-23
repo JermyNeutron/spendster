@@ -11,7 +11,7 @@ from functions import inst_pars, chase_sapphire_pref, chase_checking, sfcu_check
 
 
 # PDF file drag and drop prompt.
-def pdf_drag_drop(hints_enabled):
+def pdf_drag_drop(hints_enabled: bool) -> str:
     input_pdflink = input('Drag and drop file here: ')
     # clean input
     if input_pdflink.lower() == 'q':
@@ -31,7 +31,7 @@ def pdf_drag_drop(hints_enabled):
 
 
 # PDF location verification and script execution.
-def main(test, hints_enabled):
+def main(test: bool, hints_enabled: bool) -> None:
     while True:
         pdflink = pdf_drag_drop(hints_enabled)
         if not pdflink:

@@ -16,13 +16,13 @@ list_institutions = {
 
 
 # Extract text from the provided path.
-def extraction_func(path):
+def extraction_func(path: str) -> str:
     text = pdfmextract_text(path)
     return text
 
 
 # Write the extracted text to temp file.
-def extraction_writing(test, text):
+def extraction_writing(test: bool, text: str) -> None:
     path = 'temp/temp_scrape.txt' if not test else 'temp/test_temp_scrape.txt'
     extracted_text = [item.strip() for item in text.split('\n') if item != '']
     with open(path, 'w', encoding="utf-8", errors="replace") as file:
@@ -31,7 +31,7 @@ def extraction_writing(test, text):
 
 
 # Parse text to identify the institution.
-def ident_inst(hints_enabled, extracted_text):
+def ident_inst(hints_enabled: bool, extracted_text: list) -> tuple[str, str]:
     for inst, keywords in list_institutions.items():
         for keyword in keywords:
             if keyword in extracted_text:
@@ -42,7 +42,7 @@ def ident_inst(hints_enabled, extracted_text):
 
 
 # Main function of script.
-def main(test, hints_enabled, path):
+def main(test: bool, hints_enabled: bool, path: str) -> tuple[str, str]:
     extracted_text = extraction_func(path)
     inst_select, inst_doc = ident_inst(hints_enabled, extracted_text)
     if inst_select == 'Chase':
