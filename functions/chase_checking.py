@@ -28,7 +28,7 @@ class Transaction:
 
 
 # Centralized keyword scraping function.
-def keyword_search(hints_enabled, extracted_text, keyphrase):
+def keyword_search(hints_enabled: bool, extracted_text: list, keyphrase: str) -> str:
     for i, line in enumerate(extracted_text):
         if keyphrase in line:
             if i + 1 < len(extracted_text):
@@ -38,7 +38,7 @@ def keyword_search(hints_enabled, extracted_text, keyphrase):
 
 
 # Find statement's month.
-def find_month(hints_enabled, extracted_text):
+def find_month(hints_enabled: bool, extracted_text: list) -> tuple[str, str]:
     keyphrase = 'Columbus, OH 43218 - 2051'
     return_text = keyword_search(hints_enabled, extracted_text, keyphrase)
     return_text_split = return_text.split(' ')
@@ -51,7 +51,7 @@ def find_month(hints_enabled, extracted_text):
 
 
 # Collect statement ending balance.
-def find_ending_balance(hints_enabled, extracted_text):
+def find_ending_balance(hints_enabled: bool, extracted_text: list) -> str:
     keyphrase = "Ending Balance"
     occurences = []
     # Find line number for keyphrase.
@@ -67,8 +67,8 @@ def find_ending_balance(hints_enabled, extracted_text):
             return line.strip()
 
 
-# Unpack stmt_esential_dict items into CSV.
-def unpack_dict(hints_enabled, stmt_essential_dict: dict):
+# Unpack stmt_essential_dict items into CSV.
+def unpack_dict(hints_enabled: bool, stmt_essential_dict: dict) -> list:
     keyval_pair = []
     for key, value in stmt_essential_dict.items():
         keyval_pair.append((key, value))
@@ -81,7 +81,7 @@ def unpack_dict(hints_enabled, stmt_essential_dict: dict):
 
 
 # Centralized scraping function.
-def transaction_scrape(hints_enabled, extracted_text, counter, end_phrase):
+def transaction_scrape(hints_enabled: bool, extracted_text: list, counter: int, end_phrase: str) -> list:
     date_format = re.compile(r'^\d{2}/\d{2}$')
     transactions_arr = []
     for i in range(1, len(extracted_text) + 1):
@@ -110,7 +110,7 @@ def transaction_scrape(hints_enabled, extracted_text, counter, end_phrase):
 
 
 # Collect first page transactions.
-def find_starting_transactions(hints_enabled, extracted_text):
+def find_starting_transactions(hints_enabled: bool, extracted_text: list) -> list:
     keyphrase = "Beginning Balance"
     end_phrase = "*end*transaction detail"
     occurences = []
@@ -127,7 +127,7 @@ def find_starting_transactions(hints_enabled, extracted_text):
 
 
 # Determine if second page transactions exist.
-def is_adl(hints_enabled, extracted_text):
+def is_adl(hints_enabled: bool, extracted_text: list):
     sp_ind = "*start*transaction detail"
     sp_bool = False
     sp_ind_occurence = []
@@ -146,7 +146,7 @@ def is_adl(hints_enabled, extracted_text):
 
 
 # Scrape second page's transactions.
-def find_adl_transactions(hints_enabled, extracted_text, sp_counter):
+def find_adl_transactions(hints_enabled: bool, extracted_text: list, sp_counter: int) -> list:
     end_phrase = '*end*transaction detail'
     if hints_enabled:
         print('\nHINT:', find_adl_transactions)
@@ -155,7 +155,7 @@ def find_adl_transactions(hints_enabled, extracted_text, sp_counter):
 
 
 # Pack and write organized data in to CSV.
-def create_csv(test, hints_enabled, export_text):
+def create_csv(test: bool, hints_enabled: bool, export_text: list) -> None:
     path = 'temp/temp.csv' if not test else 'temp/test_temp.csv'
     with open(path, mode='w', newline='') as file: # writes CSV.
         writer = csv.writer(file)
@@ -175,7 +175,7 @@ def create_csv(test, hints_enabled, export_text):
 
 
 # Main function of script.
-def main(test: bool, hints_enabled: bool, extracted_text: list[str], stmt_essential_keys=stmt_essential_keys):
+def main(test: bool, hints_enabled: bool, extracted_text: list, stmt_essential_keys: list = stmt_essential_keys) -> None:
     # Collecting CSV headers.
     export_text = []
     if hints_enabled:
