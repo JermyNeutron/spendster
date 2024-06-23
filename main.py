@@ -1,5 +1,6 @@
 import sys
 import time
+import warnings
 
 sys.path.append('.')
 
@@ -25,8 +26,7 @@ def pdf_drag_drop(hints_enabled):
             pdflink_strstart = input_pdflink[pdflink_pos:]
         pdflink = pdflink_strstart.replace('\\', '/')
         # testing purposes
-        if hints_enabled:
-            print(f"\nHINT: You provided: {pdflink}")
+        hints_enabled and print(f"\nHINT: You provided: {pdflink}")
         return pdflink
 
 
@@ -45,22 +45,23 @@ def main(test, hints_enabled):
                 extracted_text = [item for item in text.split('\n') if item != '']
                 # institution-specific analysis
                 if institution == 'Chase':
-                    if document == 'Sapphire Preferred':
-                        if hints_enabled:
-                            print(chase_sapphire_pref)
+                    if document == 'Sapphire Preferred': # CC
+                        hints_enabled and print(chase_sapphire_pref)
                         chase_sapphire_pref.main(test, hints_enabled, extracted_text)
-                        if hints_enabled:
-                            print(f"HINT: program sleeping...")
+                        hints_enabled and print(f"HINT: program sleeping...")
                         time.sleep(3)
                         return False
-                    if document == 'Chase debit':
-                        if hints_enabled:
-                            print(chase_checking)
+                    elif document == 'Chase debit': # Checking
+                        hints_enabled and print(chase_checking)
                         chase_checking.main(test, hints_enabled, extracted_text)
-                        if hints_enabled:
-                            print(f"HINT: program sleeping...")
+                        hints_enabled and print(f"HINT: program sleeping...")
                         time.sleep(3)
                         return False
+                elif institution == 'SchoolsFirst':
+                    if document == 'www.SchoolsFirstFcu.org':
+                        warnings.warn('SchoolsFirst CC isn\'t implemented yet!')
+                    elif document == 'www.SchoolsFirstfcu.org':
+                        warnings.warn('SchoolsFirst Checking isn\'t implemented yet!')
                 else:
                     print('Institution or statement not supported.\nPlease submit an issue and we\'ll get right to it.')
             except pdfminer.pdfparser.PDFSyntaxError as e:
