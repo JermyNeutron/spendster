@@ -7,7 +7,7 @@ sys.path.append('.')
 import pdfminer
 import pdfminer.pdfparser
 
-from functions import inst_pars, chase_sapphire_pref, chase_checking
+from functions import inst_pars, chase_sapphire_pref, chase_checking, sfcu_checking
 
 
 # PDF file drag and drop prompt.
@@ -41,27 +41,32 @@ def main(test, hints_enabled):
                 institution, document = inst_pars.main(test, hints_enabled, pdflink)
                 path = 'temp/temp_scrape.txt' if not test else 'temp/test_temp_scrape.txt'
                 with open(path, 'r') as file:
-                    text = file.read()
-                extracted_text = [item for item in text.split('\n') if item != '']
+                    uf_text = file.read()
+                extracted_text = [item for item in uf_text.split('\n') if item != '']
                 # institution-specific analysis
                 if institution == 'Chase':
                     if document == 'Sapphire Preferred': # CC
                         hints_enabled and print(chase_sapphire_pref)
                         chase_sapphire_pref.main(test, hints_enabled, extracted_text)
                         hints_enabled and print(f"HINT: program sleeping...")
-                        time.sleep(3)
-                        return False
+                        time.sleep(3) #
+                        return False # REMOVEABLE
                     elif document == 'Chase debit': # Checking
                         hints_enabled and print(chase_checking)
                         chase_checking.main(test, hints_enabled, extracted_text)
                         hints_enabled and print(f"HINT: program sleeping...")
-                        time.sleep(3)
-                        return False
+                        time.sleep(3) #
+                        return False # REMOVEABLE
                 elif institution == 'SchoolsFirst':
                     if document == 'www.SchoolsFirstFcu.org':
                         warnings.warn('SchoolsFirst CC isn\'t implemented yet!')
+                        time.sleep(3) #
+                        return False # REMOVEABLE
                     elif document == 'www.SchoolsFirstfcu.org':
                         warnings.warn('SchoolsFirst Checking isn\'t implemented yet!')
+                        sfcu_checking.main(test, hints_enabled, uf_text)
+                        time.sleep(3) #
+                        return False # REMOVEABLE
                 else:
                     print('Institution or statement not supported.\nPlease submit an issue and we\'ll get right to it.')
             except pdfminer.pdfparser.PDFSyntaxError as e:
@@ -74,3 +79,10 @@ if __name__ == '__main__':
     test = True
     hints_enabled = True
     main(test, hints_enabled)
+
+
+'''
+Commit Comments:
+- 
+
+'''
