@@ -17,7 +17,7 @@ stmt_essential_keys = ['month', 'balance', 'payment', 'points']
 
 
 # Scrape document.
-def keyword_search(hints_enabled, extracted_text, keyphrase):
+def keyword_search(hints_enabled: bool, extracted_text: list, keyphrase: str) -> str:
     # lines = extracted_text.splitlines()
     for i, line in enumerate(extracted_text):
         if keyphrase in line:
@@ -32,14 +32,14 @@ def keyword_search(hints_enabled, extracted_text, keyphrase):
 
 
 # Find statement's month.
-def find_month(hints_enabled, extracted_text):
+def find_month(hints_enabled: bool, extracted_text: list) -> str:
     keyphrase = 'SCENARIO-1D'
     return_month = keyword_search(hints_enabled, extracted_text, keyphrase)
     return month_rollback(return_month)
 
 
 # Rollback find_month() return to correct month.
-def month_rollback(stmt_month=str):
+def month_rollback(stmt_month: str) -> str:
     var_month, var_year = stmt_month.split()
     for i, value in months_dict.items():
         if value == var_month:
@@ -48,25 +48,25 @@ def month_rollback(stmt_month=str):
 
 
 # Find statement's balance.
-def find_new_balance(hints_enabled, extracted_text):
+def find_new_balance(hints_enabled: bool, extracted_text: list) -> str:
     keyphrase = 'New Balance'
     return keyword_search(hints_enabled, extracted_text, keyphrase)
 
 
 # Find statement's minimum payment.
-def find_min_payment(hints_enabled, extracted_text):
+def find_min_payment(hints_enabled: bool, extracted_text: list) -> str:
     keyphrase = 'Minimum Payment Due:'
     return keyword_search(hints_enabled, extracted_text, keyphrase)
 
 
 # Find available reward points.
-def find_available_points(hints_enabled, extracted_text):
+def find_available_points(hints_enabled: bool, extracted_text: list) -> str:
     keyphrase = 'redemption'
     return keyword_search(hints_enabled, extracted_text, keyphrase)
 
 
 # Unpack stmt_essential_dict items into csv
-def unpack_dict(hints_enabled, stmt_essential_dict: dict):
+def unpack_dict(hints_enabled: bool, stmt_essential_dict: dict) -> list:
     keyval_pair = []
     for key, value in stmt_essential_dict.items():
         keyval_pair.append((key, value))
@@ -77,11 +77,11 @@ def unpack_dict(hints_enabled, stmt_essential_dict: dict):
 ''' First page scraping '''
 
 # Find starting index for transaction dates.
-def find_starting_dates(hints_enabled, extracted_text):
+def find_starting_dates(hints_enabled: bool, extracted_text: list) -> tuple[list, int, int]:
 
 
     # Count preceding dates to determine text gap to merchants
-    def count_backward(hints_enabled, retro_counter):
+    def count_backward(hints_enabled: bool, retro_counter: int) -> int:
         line_skip = 0
         skip_array = []
         retro_counter -= 1
@@ -99,7 +99,7 @@ def find_starting_dates(hints_enabled, extracted_text):
                         return line_skip
 
 
-    def count_forward(hints_enabled, counter):
+    def count_forward(hints_enabled: bool, counter: int) -> tuple[list, int]:
         while counter < len(extracted_text):
             for line_number, line in enumerate(extracted_text, start=1):
                 if line_number == counter:
@@ -135,11 +135,11 @@ def find_starting_dates(hints_enabled, extracted_text):
 
 
 # Collect first page's merchants.
-def find_starting_merchants(hints_enabled, extracted_text, merchant_counter, line_skip):
+def find_starting_merchants(hints_enabled:bool, extracted_text: list, merchant_counter: int, line_skip: int) -> tuple[list, int, int]:
 
 
     # Redudant counter for '$ Amount'
-    def find_price_counter():
+    def find_price_counter() -> int:
         counter: int = 0
         ending_phrase_1 = "$ Amount"
         for line_number, line in enumerate(extracted_text, start=1):
@@ -185,7 +185,7 @@ def find_starting_merchants(hints_enabled, extracted_text, merchant_counter, lin
 
 
 # Collect first page's amounts.
-def find_starting_amounts(hints_enabled, extracted_text, price_counter, line_skip, reject_counter):
+def find_starting_amounts(hints_enabled: bool, extracted_text: list, price_counter: int, line_skip: int, reject_counter: int) -> tuple[list, int]:
     if line_skip is None:
         line_skip = 0
     if hints_enabled:
@@ -222,7 +222,7 @@ def find_starting_amounts(hints_enabled, extracted_text, price_counter, line_ski
 
 
 # Determine if there is a second transaction page.
-def is_sp(hints_enabled, extracted_text):
+def is_sp(hints_enabled:bool, extracted_text: list) -> bool:
     phrase = "Date of"
     occurrences = []
     for line_number, line in enumerate(extracted_text, start=1):
@@ -241,7 +241,7 @@ def is_sp(hints_enabled, extracted_text):
 
 
 # Collect second page's transaction dates.
-def find_addl_dates(hints_enabled, extracted_text):
+def find_addl_dates(hints_enabled: bool, extracted_text: list) -> tuple[list, int]:
     phrase = 'Date of'
     occurrences = []
     for line_number, line in enumerate(extracted_text, start=1):
@@ -268,7 +268,7 @@ def find_addl_dates(hints_enabled, extracted_text):
 
 
 # Collect second page's merchants.
-def find_addl_merchants(hints_enabled, extracted_text, sp_mercounter):
+def find_addl_merchants(hints_enabled: bool, extracted_text: list, sp_mercounter: int) -> list:
     counter = sp_mercounter
     ending_phrases = ['INTEREST CHARGED', 'FEES CHARGED']
     merchants = []
@@ -287,7 +287,7 @@ def find_addl_merchants(hints_enabled, extracted_text, sp_mercounter):
 
 
 # Collect second page's amounts.
-def find_addl_amounts(hints_enabled, extracted_text, limit):
+def find_addl_amounts(hints_enabled: bool, extracted_text: list, limit: int) -> list:
     phrase = "$ Amount"
     occurrences = []
     for line_number, line in enumerate(extracted_text, start=1):
@@ -311,7 +311,7 @@ def find_addl_amounts(hints_enabled, extracted_text, limit):
 
 
 # Pack and write organized data into csv.
-def create_csv(test, export_text):
+def create_csv(test: bool, export_text: list) -> None:
     path = 'temp/temp.csv' if not test else 'temp/test_temp.csv'
     with open(path, mode='w', newline='') as file: # writes CSV
         writer = csv.writer(file)
@@ -330,7 +330,7 @@ def create_csv(test, export_text):
 
 
 # Main function of script.
-def main(test, hints_enabled, extracted_text, stmt_essential_keys=stmt_essential_keys):
+def main(test: bool, hints_enabled: bool, extracted_text: list, stmt_essential_keys: list = stmt_essential_keys) -> None:
     hints_enabled and print(f"\n\nHINT: {main} running...\n")
     # Set up return statement.
     export_text = []
