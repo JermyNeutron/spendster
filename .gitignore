@@ -13,6 +13,7 @@ scratch2.py
 test_csv_view.txt
 test_temp_scrape.txt
 test_temp.csv
+word_scratch.py
 
 # VS Code workspace
 spendster.code-workspace
