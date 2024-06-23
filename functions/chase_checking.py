@@ -32,8 +32,7 @@ def keyword_search(hints_enabled, extracted_text, keyphrase):
     for i, line in enumerate(extracted_text):
         if keyphrase in line:
             if i + 1 < len(extracted_text):
-                if hints_enabled:
-                    print(f"HINT: Returning keyword_search: {extracted_text[i+1]}")
+                hints_enabled and print(f"HINT: Returning keyword_search: {extracted_text[i+1]}")
                 return extracted_text[i+1]
     return None
 
@@ -46,8 +45,7 @@ def find_month(hints_enabled, extracted_text):
     var_month, var_year = return_text_split[-3], return_text_split[-1]
     for i, month in months_dict.items():
         if var_month == month: # Redundant check of successful scrape.
-            if hints_enabled:
-                print(f"HINT: Returning month {{{i}}}: {month} {var_year}")
+            hints_enabled and print(f"HINT: Returning month {{{i}}}: {month} {var_year}")
             return f"{var_month} {var_year}", return_text
     return None
 
@@ -59,15 +57,13 @@ def find_ending_balance(hints_enabled, extracted_text):
     # Find line number for keyphrase.
     for i, line in enumerate(extracted_text, start=1):
         if keyphrase in line:
-            if hints_enabled:
-                print(f"HINT: {find_ending_balance}: {i}, {line.strip()}")
+            hints_enabled and print(f"HINT: {find_ending_balance}: {i}, {line.strip()}")
             occurences.append(i)
     # Find next line after keyphrase to return statement ending balance.
     counter = occurences.pop(0) + 1
     for i, line in enumerate(extracted_text, start=1):
         if counter == i:
-            if hints_enabled:
-                print(f"HINT: Returning balance: {line}")
+            hints_enabled and print(f"HINT: Returning balance: {line}")
             return line.strip()
 
 
@@ -105,12 +101,10 @@ def transaction_scrape(hints_enabled, extracted_text, counter, end_phrase):
                             trx_amount = extracted_text[j + 2].strip()
                             transaction_ind = (trx_date, trx_merchant, trx_amount)
                             transactions_arr.append(transaction_ind)
-                            if hints_enabled:
-                                print(f"HINT: {trx_date}, {trx_merchant}, {trx_amount}")
+                            hints_enabled and print(f"HINT: {trx_date}, {trx_merchant}, {trx_amount}")
                             j += 4
                     else:
-                        if hints_enabled:
-                            print(f"HINT: Ending phrase met: {j - 1}: \"{extracted_text[j]}\"")
+                        hints_enabled and print(f"HINT: Ending phrase met: {j - 1}: \"{extracted_text[j]}\"")
                         return transactions_arr
     return transactions_arr
 
@@ -123,8 +117,7 @@ def find_starting_transactions(hints_enabled, extracted_text):
     # find line number for keyphrase.
     for i, line in enumerate(extracted_text, start=1):
         if keyphrase in line.strip():
-            if hints_enabled:
-                print(f"HINT: {find_starting_transactions}: {i}, {line}")
+            hints_enabled and print(f"HINT: {find_starting_transactions}: {i}, {line}")
             occurences.append(i)
     counter = occurences.pop() + 2
     if hints_enabled:
@@ -167,8 +160,7 @@ def create_csv(test, hints_enabled, export_text):
     with open(path, mode='w', newline='') as file: # writes CSV.
         writer = csv.writer(file)
         writer.writerows(export_text)
-        if hints_enabled:
-            print('\nHINT: CSV created.')
+        hints_enabled and print('\nHINT: CSV created.')
     with open(path, 'r', newline='') as file:
         csv_data = list(csv.reader(file))
         formatted_data = '\n'.join('\t'.join(row) for row in csv_data)
@@ -179,8 +171,7 @@ def create_csv(test, hints_enabled, export_text):
         with open(csv_view, 'w') as file:
             for item in export_text:
                 file.write(f"{str(item)}\n")
-        if hints_enabled:
-            print('HINT: CSV view created...')
+        hints_enabled and print('HINT: CSV view created...')
 
 
 # Main function of script.

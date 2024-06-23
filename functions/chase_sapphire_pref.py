@@ -23,8 +23,7 @@ def keyword_search(hints_enabled, extracted_text, keyphrase):
         if keyphrase in line:
             # if there are 2 more lines of text, capture text
             if i + 2 < len(extracted_text):
-                if hints_enabled:
-                    print(f"HINT: returning {extracted_text[i+1]}")
+                hints_enabled and print(f"HINT: returning {extracted_text[i+1]}")
                 return extracted_text[i+1].strip()
     return None
 
@@ -71,8 +70,7 @@ def unpack_dict(hints_enabled, stmt_essential_dict: dict):
     keyval_pair = []
     for key, value in stmt_essential_dict.items():
         keyval_pair.append((key, value))
-    if hints_enabled:
-        print('\nHINT: Unpacking dictionary...')
+    hints_enabled and print('\nHINT: Unpacking dictionary...')
     return keyval_pair
 
 
@@ -127,8 +125,7 @@ def find_starting_dates(hints_enabled, extracted_text):
             print(line_number)
             retro_counter = line_number # counter for count_backwards()
             counter = line_number + 1 # add 1 to counter to start on dates
-            if hints_enabled:
-                print(f"\nHINT: dates start at: {counter}")
+            hints_enabled and print(f"\nHINT: dates start at: {counter}")
             break
     dates = []
     date_pattern = re.compile(r'^\d{2}/\d{2}$')
@@ -334,8 +331,7 @@ def create_csv(test, export_text):
 
 # Main function of script.
 def main(test, hints_enabled, extracted_text, stmt_essential_keys=stmt_essential_keys):
-    if hints_enabled:
-        print(f"\n\nHINT: {main} running...\n")
+    hints_enabled and print(f"\n\nHINT: {main} running...\n")
     # Set up return statement.
     export_text = []
     stmt_essential_dict = {key: None for key in stmt_essential_keys}
@@ -356,12 +352,10 @@ def main(test, hints_enabled, extracted_text, stmt_essential_keys=stmt_essential
         sp_merchants = find_addl_merchants(hints_enabled, extracted_text, sp_mercounter)
         sp_prices = find_addl_amounts(hints_enabled, extracted_text, sp_limit)
         stmt_transactions.extend(zip(sp_dates, sp_merchants, sp_prices))
-        if hints_enabled:
-            print('HINT: second page completed.')
+        hints_enabled and print('HINT: second page completed.')
     export_text.extend(stmt_transactions)
     # [Balance, Minimum Payment, Reward Points]
-    if hints_enabled:
-        print(F"\nHINT: fnc return {stmt_essential_dict}")
+    hints_enabled and print(F"\nHINT: fnc return {stmt_essential_dict}")
     create_csv(test, export_text)
 
 
