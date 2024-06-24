@@ -45,27 +45,28 @@ def main(test: bool, hints_enabled: bool) -> None:
                 extracted_text = [item for item in uf_text.split('\n') if item != '']
                 # institution-specific analysis
                 if institution == 'Chase':
-                    if document == 'Sapphire Preferred': # CC
+                    if document == 'Sapphire Preferred': # Chase CC
                         hints_enabled and print(chase_sapphire_pref)
                         chase_sapphire_pref.main(test, hints_enabled, extracted_text)
                         hints_enabled and print(f"HINT: program sleeping...")
-                        time.sleep(3) #
+                        time.sleep(3)
                         return False # REMOVEABLE
-                    elif document == 'Chase debit': # Checking
+                    elif document == 'Chase debit': # Chase Checking
                         hints_enabled and print(chase_checking)
                         chase_checking.main(test, hints_enabled, extracted_text)
                         hints_enabled and print(f"HINT: program sleeping...")
-                        time.sleep(3) #
+                        time.sleep(3)
                         return False # REMOVEABLE
-                elif institution == 'SchoolsFirst':
+                elif institution == 'SchoolsFirst': # SFCU CC
                     if document == 'www.SchoolsFirstFcu.org':
                         warnings.warn('SchoolsFirst CC isn\'t implemented yet!')
-                        time.sleep(3) #
+                        hints_enabled and print(f"HINT: program sleeping...")
+                        time.sleep(3)
                         return False # REMOVEABLE
-                    elif document == 'www.SchoolsFirstfcu.org':
-                        warnings.warn('SchoolsFirst Checking isn\'t implemented yet!')
+                    elif document == 'www.SchoolsFirstfcu.org': # SFCU Checking
                         sfcu_checking.main(test, hints_enabled, uf_text)
-                        time.sleep(3) #
+                        hints_enabled and print(f"HINT: program sleeping...")
+                        time.sleep(3)
                         return False # REMOVEABLE
                 else:
                     print('Institution or statement not supported.\nPlease submit an issue and we\'ll get right to it.')
