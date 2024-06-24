@@ -28,51 +28,47 @@ class Transaction:
 
 
 # Centralized keyword scraping function.
-def keyword_search(hints_enabled, extracted_text, keyphrase):
+def keyword_search(hints_enabled: bool, extracted_text: list, keyphrase: str) -> str:
     for i, line in enumerate(extracted_text):
         if keyphrase in line:
             if i + 1 < len(extracted_text):
-                if hints_enabled:
-                    print(f"HINT: Returning keyword_search: {extracted_text[i+1]}")
+                hints_enabled and print(f"HINT: Returning keyword_search: {extracted_text[i+1]}")
                 return extracted_text[i+1]
     return None
 
 
 # Find statement's month.
-def find_month(hints_enabled, extracted_text):
+def find_month(hints_enabled: bool, extracted_text: list) -> tuple[str, str]:
     keyphrase = 'Columbus, OH 43218 - 2051'
     return_text = keyword_search(hints_enabled, extracted_text, keyphrase)
     return_text_split = return_text.split(' ')
     var_month, var_year = return_text_split[-3], return_text_split[-1]
     for i, month in months_dict.items():
         if var_month == month: # Redundant check of successful scrape.
-            if hints_enabled:
-                print(f"HINT: Returning month {{{i}}}: {month} {var_year}")
+            hints_enabled and print(f"HINT: Returning month {{{i}}}: {month} {var_year}")
             return f"{var_month} {var_year}", return_text
     return None
 
 
 # Collect statement ending balance.
-def find_ending_balance(hints_enabled, extracted_text):
+def find_ending_balance(hints_enabled: bool, extracted_text: list) -> str:
     keyphrase = "Ending Balance"
     occurences = []
     # Find line number for keyphrase.
     for i, line in enumerate(extracted_text, start=1):
         if keyphrase in line:
-            if hints_enabled:
-                print(f"HINT: {find_ending_balance}: {i}, {line.strip()}")
+            hints_enabled and print(f"HINT: {find_ending_balance}: {i}, {line.strip()}")
             occurences.append(i)
     # Find next line after keyphrase to return statement ending balance.
     counter = occurences.pop(0) + 1
     for i, line in enumerate(extracted_text, start=1):
         if counter == i:
-            if hints_enabled:
-                print(f"HINT: Returning balance: {line}")
+            hints_enabled and print(f"HINT: Returning balance: {line}")
             return line.strip()
 
 
-# Unpack stmt_esential_dict items into CSV.
-def unpack_dict(hints_enabled, stmt_essential_dict: dict):
+# Unpack stmt_essential_dict items into CSV.
+def unpack_dict(hints_enabled: bool, stmt_essential_dict: dict) -> list:
     keyval_pair = []
     for key, value in stmt_essential_dict.items():
         keyval_pair.append((key, value))
@@ -85,7 +81,7 @@ def unpack_dict(hints_enabled, stmt_essential_dict: dict):
 
 
 # Centralized scraping function.
-def transaction_scrape(hints_enabled, extracted_text, counter, end_phrase):
+def transaction_scrape(hints_enabled: bool, extracted_text: list, counter: int, end_phrase: str) -> list:
     date_format = re.compile(r'^\d{2}/\d{2}$')
     transactions_arr = []
     for i in range(1, len(extracted_text) + 1):
@@ -105,26 +101,23 @@ def transaction_scrape(hints_enabled, extracted_text, counter, end_phrase):
                             trx_amount = extracted_text[j + 2].strip()
                             transaction_ind = (trx_date, trx_merchant, trx_amount)
                             transactions_arr.append(transaction_ind)
-                            if hints_enabled:
-                                print(f"HINT: {trx_date}, {trx_merchant}, {trx_amount}")
+                            hints_enabled and print(f"HINT: {trx_date}, {trx_merchant}, {trx_amount}")
                             j += 4
                     else:
-                        if hints_enabled:
-                            print(f"HINT: Ending phrase met: {j - 1}: \"{extracted_text[j]}\"")
+                        hints_enabled and print(f"HINT: Ending phrase met: {j - 1}: \"{extracted_text[j]}\"")
                         return transactions_arr
     return transactions_arr
 
 
 # Collect first page transactions.
-def find_starting_transactions(hints_enabled, extracted_text):
+def find_starting_transactions(hints_enabled: bool, extracted_text: list) -> list:
     keyphrase = "Beginning Balance"
     end_phrase = "*end*transaction detail"
     occurences = []
     # find line number for keyphrase.
     for i, line in enumerate(extracted_text, start=1):
         if keyphrase in line.strip():
-            if hints_enabled:
-                print(f"HINT: {find_starting_transactions}: {i}, {line}")
+            hints_enabled and print(f"HINT: {find_starting_transactions}: {i}, {line}")
             occurences.append(i)
     counter = occurences.pop() + 2
     if hints_enabled:
@@ -134,7 +127,7 @@ def find_starting_transactions(hints_enabled, extracted_text):
 
 
 # Determine if second page transactions exist.
-def is_adl(hints_enabled, extracted_text):
+def is_adl(hints_enabled: bool, extracted_text: list):
     sp_ind = "*start*transaction detail"
     sp_bool = False
     sp_ind_occurence = []
@@ -153,7 +146,7 @@ def is_adl(hints_enabled, extracted_text):
 
 
 # Scrape second page's transactions.
-def find_adl_transactions(hints_enabled, extracted_text, sp_counter):
+def find_adl_transactions(hints_enabled: bool, extracted_text: list, sp_counter: int) -> list:
     end_phrase = '*end*transaction detail'
     if hints_enabled:
         print('\nHINT:', find_adl_transactions)
@@ -162,13 +155,12 @@ def find_adl_transactions(hints_enabled, extracted_text, sp_counter):
 
 
 # Pack and write organized data in to CSV.
-def create_csv(test, hints_enabled, export_text):
+def create_csv(test: bool, hints_enabled: bool, export_text: list) -> None:
     path = 'temp/temp.csv' if not test else 'temp/test_temp.csv'
     with open(path, mode='w', newline='') as file: # writes CSV.
         writer = csv.writer(file)
         writer.writerows(export_text)
-        if hints_enabled:
-            print('\nHINT: CSV created.')
+        hints_enabled and print('\nHINT: CSV created.')
     with open(path, 'r', newline='') as file:
         csv_data = list(csv.reader(file))
         formatted_data = '\n'.join('\t'.join(row) for row in csv_data)
@@ -179,12 +171,11 @@ def create_csv(test, hints_enabled, export_text):
         with open(csv_view, 'w') as file:
             for item in export_text:
                 file.write(f"{str(item)}\n")
-        if hints_enabled:
-            print('HINT: CSV view created...')
+        hints_enabled and print('HINT: CSV view created...')
 
 
 # Main function of script.
-def main(test: bool, hints_enabled: bool, extracted_text: list[str], stmt_essential_keys=stmt_essential_keys):
+def main(test: bool, hints_enabled: bool, extracted_text: list, stmt_essential_keys: list = stmt_essential_keys) -> None:
     # Collecting CSV headers.
     export_text = []
     if hints_enabled:
