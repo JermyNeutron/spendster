@@ -67,6 +67,7 @@ if __name__ == '__main__':
     path_2 = 'rep_statements/20240511-statements-1149-.pdf'
     path_3 = 'rep_statements/20240320-statements-9266-.pdf'
     path_4 = 'rep_statements\sfcu-cc-05.pdf'
+    path_5 = 'rep_statements\sfcu-ch-05.pdf'
     test_choice = input('Choose path: ')
     try:
         if test_choice == '1':
@@ -77,6 +78,8 @@ if __name__ == '__main__':
             institution, document = main(test, hints_enabled, path_3)
         elif test_choice == '4':
             institution, document = main(test, hints_enabled, path_4)
+        elif test_choice == '5':
+            institution, document = main(test, hints_enabled, path_5)
         elif test_choice == 'q':
             pass
     except NameError as e:
