@@ -113,7 +113,7 @@ def find_transactions(hints_enabled: bool, extracted_text: list, counter: int) -
                         trx_amount = extracted_text[j+2].strip()
                         trx_ind = (trx_date, trx_merchant, trx_amount)
                         transactions_arr.append(trx_ind)
-                        hints_enabled and print(f"HINT: {trx_date}, {trx_merchant}, {trx_amount}")
+                        hints_enabled and print(f"HINT: {trx_date}, {trx_amount}, {trx_merchant}")
                         j+=5
 
 
