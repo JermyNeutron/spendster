@@ -9,15 +9,16 @@ A quick way to scrape your bank and credit card statements for your own personal
 > - SchoolsFirst Credit Union Checking (1 page)
 >
 > **Credit Cards**
-> - Chase Sapphire Preferred (up to 2 transaction pages, card payments/credits not included)
-> - (**WIP**) SchoolsFirst Credit Union Credit
+> - Chase Sapphire Preferred (+2 transaction pages, card payments/credits not included)
+> - (**WIP**) SchoolsFirst Credit Union Inspire
+> - (**Planned**) Synchrony Car Care
 >
 > This will be updated as additional statements and institutions are prepared. 
 
 <!-- ## Setup -->
 
 ## Usage
-Drag and drop your bank statement into the prompt to create a comma-separated values (CSV) file. It will automatically copy the contents of the CSV into your clipboard so once you drag and drop your bank statement, you can go into spreadsheet and press \<CTRL + V\>. You can also open and view the CSV file with any spread sheet viewer or upload online to Google Sheets to view.
+Drag and drop your checking or credit card statement into the prompt to create a comma-separated values (CSV) file. It will automatically copy the contents of the CSV into your clipboard so once you drag and drop your bank statement, you can go into spreadsheet and press \<CTRL + V\>. You can also open and view the CSV file with any spread sheet viewer or upload online to Google Sheets to view.
 
 <!-- ## Frequently Asked Questions -->
 
