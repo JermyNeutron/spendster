@@ -99,7 +99,7 @@ def transaction_scrape(hints_enabled: bool, extracted_text: list, counter: int, 
                             pre_trx_merchant = extracted_text[j + 1].strip()
                             trx_merchant = ' '.join(pre_trx_merchant.split())
                             trx_amount = extracted_text[j + 2].strip()
-                            transaction_ind = (trx_date, trx_merchant, trx_amount)
+                            transaction_ind = (trx_date, trx_amount, trx_merchant)
                             transactions_arr.append(transaction_ind)
                             hints_enabled and print(f"HINT: {trx_date}, {trx_amount}, {trx_merchant}")
                             j += 4
