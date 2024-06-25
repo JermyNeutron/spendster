@@ -111,9 +111,9 @@ def find_transactions(hints_enabled: bool, extracted_text: list, counter: int) -
                         trx_date = extracted_text[j].strip()
                         trx_merchant = ' '.join([extracted_text[j+1], extracted_text[j+4]])
                         trx_amount = extracted_text[j+2].strip()
-                        trx_ind = (trx_date, trx_merchant, trx_amount)
+                        trx_ind = (trx_date, trx_amount, trx_merchant)
                         transactions_arr.append(trx_ind)
-                        hints_enabled and print(f"HINT: {trx_date}, {trx_merchant}, {trx_amount}")
+                        hints_enabled and print(f"HINT: {trx_date}, {trx_amount}, {trx_merchant}")
                         j+=5
 
 
@@ -138,7 +138,6 @@ def create_csv(test: bool, hints_enabled: bool, export_text: list) -> None:
 
 # Main function of script.
 def main(test: bool, hints_enabled: bool, uf_text: str) -> None:
-    warnings.warn('main() not developed yet')
     hints_enabled and print('sfcu_checking.main() executing...')
     export_text = []
     stmt_essential_dict = {key: None for key in stmt_essential_keys}
