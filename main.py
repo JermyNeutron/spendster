@@ -7,14 +7,14 @@ sys.path.append('.')
 import pdfminer
 import pdfminer.pdfparser
 
-from functions import inst_pars, chase_sapphire_pref, chase_checking, sfcu_checking
+from functions import inst_pars, chase_sapphire_pref, chase_checking, sfcu_checking, sfcu_inspire
 
 
 # PDF file drag and drop prompt.
 def pdf_drag_drop(hints_enabled: bool) -> str:
     input_pdflink = input('Drag and drop file here: ')
     # clean input
-    if input_pdflink.lower() == 'q':
+    if input_pdflink.lower() == 'q': # Exit
         return False
     else:
         pdflink_pos = input_pdflink.lower().find("c")
@@ -48,26 +48,22 @@ def main(test: bool, hints_enabled: bool) -> None:
                     if document == 'Sapphire Preferred': # Chase CC
                         hints_enabled and print(chase_sapphire_pref)
                         chase_sapphire_pref.main(test, hints_enabled, extracted_text)
-                        hints_enabled and print(f"HINT: program sleeping...")
-                        time.sleep(3)
-                        return False # REMOVEABLE
+                        hints_enabled and print(f"HINT: program resetting...")
+                        time.sleep(2)
                     elif document == 'Chase debit': # Chase Checking
                         hints_enabled and print(chase_checking)
                         chase_checking.main(test, hints_enabled, extracted_text)
-                        hints_enabled and print(f"HINT: program sleeping...")
-                        time.sleep(3)
-                        return False # REMOVEABLE
+                        hints_enabled and print(f"HINT: program resetting...")
+                        time.sleep(2)
                 elif institution == 'SchoolsFirst': # SFCU CC
                     if document == 'www.SchoolsFirstFcu.org':
-                        warnings.warn('SchoolsFirst CC isn\'t implemented yet!')
-                        hints_enabled and print(f"HINT: program sleeping...")
-                        time.sleep(3)
-                        return False # REMOVEABLE
+                        sfcu_inspire.main(test, hints_enabled, extracted_text)
+                        hints_enabled and print(f"HINT: program resetting...")
+                        time.sleep(2)
                     elif document == 'www.SchoolsFirstfcu.org': # SFCU Checking
                         sfcu_checking.main(test, hints_enabled, uf_text)
-                        hints_enabled and print(f"HINT: program sleeping...")
-                        time.sleep(3)
-                        return False # REMOVEABLE
+                        hints_enabled and print(f"HINT: program resetting...")
+                        time.sleep(2)
                 else:
                     print('Institution or statement not supported.\nPlease submit an issue and we\'ll get right to it.')
             except pdfminer.pdfparser.PDFSyntaxError as e:
