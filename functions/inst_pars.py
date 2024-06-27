@@ -12,6 +12,7 @@ from pdfminer.high_level import extract_text as pdfmextract_text
 list_institutions = {
     'Chase': ['Sapphire Preferred', 'Chase debit',],
     'SchoolsFirst': ['www.SchoolsFirstFcu.org', 'www.SchoolsFirstfcu.org',], # save 'MasterCard' if URL ever gets fixed on Checking
+    'Synchrony': ['SYNCHRONY CAR CARE',],
 }
 
 
@@ -53,6 +54,10 @@ def main(test: bool, hints_enabled: bool, path: str) -> tuple[str, str]:
         if hints_enabled:
             print(f'HINT: {ident_inst}: INSTITUTION FOUND: SchoolsFirst {inst_doc}')
             print(f'HINT: returning {inst_select}, {inst_doc}')
+    elif inst_select == 'Synchrony':
+        if hints_enabled:
+            print(f'HINT: {ident_inst}: INSTITUTION FOUND: {inst_doc}')
+            print(f'HINT: returning {inst_select}, {inst_doc}')
     else: # change to elif
         hints_enabled and warnings.warn('Unidentified document presented!')
         return None
@@ -68,20 +73,26 @@ if __name__ == '__main__':
     path_3 = 'rep_statements/20240320-statements-9266-.pdf'
     path_4 = 'rep_statements\sfcu-cc-05.pdf'
     path_5 = 'rep_statements\sfcu-ch-05.pdf'
+    path_6 = 'rep_statements\synchrony_03.pdf'
+    path_7 = 'rep_statements\synchrony_06.pdf'
     test_choice = input('Choose path: ')
     try:
-        if test_choice == '1':
-            institution, document = main(test, hints_enabled, path_1)
-        elif test_choice == '2':
-            institution, document = main(test, hints_enabled, path_2)
-        elif test_choice == '3':
-            institution, document = main(test, hints_enabled, path_3)
-        elif test_choice == '4':
-            institution, document = main(test, hints_enabled, path_4)
-        elif test_choice == '5':
-            institution, document = main(test, hints_enabled, path_5)
-        elif test_choice == 'q':
-            pass
+        match test_choice:
+            case '1':
+                main(test, hints_enabled, path_1)
+            case '2':
+                main(test, hints_enabled, path_2)
+            case '3':
+                main(test, hints_enabled, path_3)
+            case '4':
+                main(test, hints_enabled, path_4)
+            case '5':
+                main(test, hints_enabled, path_5)
+            case '6':
+                main(test, hints_enabled, path_6)
+            case '7':
+                main(test, hints_enabled, path_7)
+            case 'q':
+                pass
     except NameError as e:
         print('Invalid choice.')
-        

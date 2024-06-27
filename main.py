@@ -7,7 +7,7 @@ sys.path.append('.')
 import pdfminer
 import pdfminer.pdfparser
 
-from functions import inst_pars, chase_sapphire_pref, chase_checking, sfcu_checking, sfcu_inspire
+from functions import inst_pars, chase_sapphire_pref, chase_checking, sfcu_checking, sfcu_inspire, synchrony
 
 
 # PDF file drag and drop prompt.
@@ -32,6 +32,7 @@ def pdf_drag_drop(hints_enabled: bool) -> str:
 
 # PDF location verification and script execution.
 def main(test: bool, hints_enabled: bool) -> None:
+    print('HINT: Enter \'q\' to quickly end this program!\n\n')
     while True:
         pdflink = pdf_drag_drop(hints_enabled)
         if not pdflink:
@@ -64,6 +65,10 @@ def main(test: bool, hints_enabled: bool) -> None:
                         sfcu_checking.main(test, hints_enabled, uf_text)
                         hints_enabled and print(f"HINT: program resetting...")
                         time.sleep(2)
+                elif institution == 'Synchrony': # Synchrony
+                    synchrony.main(test, hints_enabled, extracted_text)
+                    hints_enabled and print(f"HINT: program resetting...")
+                    time.sleep(2)
                 else:
                     print('Institution or statement not supported.\nPlease submit an issue and we\'ll get right to it.')
             except pdfminer.pdfparser.PDFSyntaxError as e:
