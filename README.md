@@ -2,7 +2,7 @@
 A quick way to scrape your bank and credit card statements for your own personal tracking.
 
 >[!WARNING]
-> As of 06/25/2024, these are the only supported statements:
+> As of 06/27/2024, these are the only supported statements:
 >
 > **Checking Accounts**
 > - Chase Checking (+2 transaction pages)
@@ -11,8 +11,8 @@ A quick way to scrape your bank and credit card statements for your own personal
 > **Credit Cards**
 > - Chase Sapphire Preferred (+2 transaction pages, card payments/credits not included)
 > - SchoolsFirst Credit Union Inspire (1 page)
-> - Synchrony Car Care
-> - (**Planned**) PayPal Credit
+> - Synchrony Car Care (1 page)
+> - (**WIP**) PayPal Credit
 >
 > This will be updated as additional statements and institutions are prepared. 
 
