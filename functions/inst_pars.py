@@ -6,13 +6,18 @@ from pdfminer.high_level import extract_text as pdfmextract_text
 
 '''Supported Institutions and Statements
 - Chase Sapphire Preferred
-- Chase Debit (WIP)
+- Chase Checking
+- PayPal Credit
+- SchoolsFirst Checking
+- SchoolsFirst Inspire
+- Synchrony Car Care
 '''
 
 list_institutions = {
     'Chase': ['Sapphire Preferred', 'Chase debit',],
     'SchoolsFirst': ['www.SchoolsFirstFcu.org', 'www.SchoolsFirstfcu.org',], # save 'MasterCard' if URL ever gets fixed on Checking
     'Synchrony': ['SYNCHRONY CAR CARE',],
+    'PayPal': ['PayPal Credit',],
 }
 
 
@@ -58,6 +63,10 @@ def main(test: bool, hints_enabled: bool, path: str) -> tuple[str, str]:
         if hints_enabled:
             print(f'HINT: {ident_inst}: INSTITUTION FOUND: {inst_doc}')
             print(f'HINT: returning {inst_select}, {inst_doc}')
+    elif inst_select == 'PayPal':
+        if hints_enabled:
+            print(f'HINT: {ident_inst}: INSTITUTION FOUND: {inst_doc}')
+            print(f'HINT: returning {inst_select}, {inst_doc}')
     else: # change to elif
         hints_enabled and warnings.warn('Unidentified document presented!')
         return None
@@ -75,6 +84,8 @@ if __name__ == '__main__':
     path_5 = 'rep_statements\sfcu-ch-05.pdf'
     path_6 = 'rep_statements\synchrony_03.pdf'
     path_7 = 'rep_statements\synchrony_06.pdf'
+    path_8 = 'rep_statements\paypal_03.pdf'
+    path_9 = 'rep_statements\paypal_11.pdf'
     test_choice = input('Choose path: ')
     try:
         match test_choice:
@@ -92,6 +103,10 @@ if __name__ == '__main__':
                 main(test, hints_enabled, path_6)
             case '7':
                 main(test, hints_enabled, path_7)
+            case '8':
+                main(test, hints_enabled, path_8)
+            case '9':
+                main(test, hints_enabled, path_9)
             case 'q':
                 pass
     except NameError as e:
