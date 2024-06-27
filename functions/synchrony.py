@@ -9,7 +9,7 @@ import pyperclip
 sys.path.append('.')
 
 from functions.inst_pars import extraction_func, extraction_writing
-from calendar_months import months_dict
+from .calendar_months import months_dict # preceding '.' for main.py execution
 
 
 def keyphrase_search(hints_enabled: bool, extracted_text: list, keyphrase: str) -> int:
