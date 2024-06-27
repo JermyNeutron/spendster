@@ -11,7 +11,7 @@ A quick way to scrape your bank and credit card statements for your own personal
 > **Credit Cards**
 > - Chase Sapphire Preferred (+2 transaction pages, card payments/credits not included)
 > - SchoolsFirst Credit Union Inspire (1 page)
-> - (**Planned**) Synchrony Car Care
+> - Synchrony Car Care
 > - (**Planned**) PayPal Credit
 >
 > This will be updated as additional statements and institutions are prepared. 
