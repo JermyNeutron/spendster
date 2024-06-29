@@ -24,7 +24,7 @@ def pdf_drag_drop(hints_enabled: bool) -> str:
             pdflink_strstart = input_pdflink[pdflink_pos:-1]
         else:
             pdflink_strstart = input_pdflink[pdflink_pos:]
-        pdflink = pdflink_strstart.replace('\\', '/')
+        pdflink = pdflink_strstart.replace('\"', '')
         # Testing purposes
         hints_enabled and print(f"\nHINT: You provided: {pdflink}")
         return pdflink
