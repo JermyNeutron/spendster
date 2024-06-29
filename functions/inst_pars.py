@@ -1,6 +1,7 @@
 # Institution Parser
 import warnings
 
+import PyPDF2 as pypdf2
 from pdfminer.high_level import extract_text as pdfmextract_text
 
 
@@ -22,9 +23,19 @@ list_institutions = {
 
 
 # Extract text from the provided path.
-def extraction_func(path: str) -> str:
+def extraction_func_def(path: str) -> str:
     text = pdfmextract_text(path)
     return text
+
+
+def extraction_func_pypdf2(path: str) -> str:
+    with open(path, 'rb') as file:
+        reader = pypdf2.PdfReader(file)
+        return_text = ""
+        for page_num in range(len(reader.pages)):
+            page = reader.pages[page_num]
+            return_text += page.extract_text()
+            return return_text
 
 
 # Write the extracted text to temp file.
@@ -49,7 +60,7 @@ def ident_inst(hints_enabled: bool, extracted_text: list) -> tuple[str, str]:
 
 # Main function of script.
 def main(test: bool, hints_enabled: bool, path: str) -> tuple[str, str]:
-    extracted_text = extraction_func(path)
+    extracted_text = extraction_func_def(path)
     inst_select, inst_doc = ident_inst(hints_enabled, extracted_text)
     if inst_select == 'Chase':
         if hints_enabled:
@@ -70,6 +81,9 @@ def main(test: bool, hints_enabled: bool, path: str) -> tuple[str, str]:
     else: # change to elif
         hints_enabled and warnings.warn('Unidentified document presented!')
         return None
+    if inst_select == 'PayPal':
+        print('doing paypal')
+        extracted_text = extraction_func_pypdf2(path)
     extraction_writing(test, extracted_text)
     return inst_select, inst_doc
 
