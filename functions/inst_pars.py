@@ -82,7 +82,6 @@ def main(test: bool, hints_enabled: bool, path: str) -> tuple[str, str]:
         hints_enabled and warnings.warn('Unidentified document presented!')
         return None
     if inst_select == 'PayPal':
-        print('doing paypal')
         extracted_text = extraction_func_pypdf2(path)
     extraction_writing(test, extracted_text)
     return inst_select, inst_doc
