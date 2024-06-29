@@ -13,7 +13,7 @@ from functions import inst_pars, chase_sapphire_pref, chase_checking, sfcu_check
 # PDF file drag and drop prompt.
 def pdf_drag_drop(hints_enabled: bool) -> str:
     input_pdflink = input('Drag and drop file here: ')
-    # clean input
+    # Clean input
     if input_pdflink.lower() == 'q': # Exit
         return False
     else:
@@ -25,7 +25,7 @@ def pdf_drag_drop(hints_enabled: bool) -> str:
         else:
             pdflink_strstart = input_pdflink[pdflink_pos:]
         pdflink = pdflink_strstart.replace('\\', '/')
-        # testing purposes
+        # Testing purposes
         hints_enabled and print(f"\nHINT: You provided: {pdflink}")
         return pdflink
 
@@ -44,7 +44,7 @@ def main(test: bool, hints_enabled: bool) -> None:
                 with open(path, 'r') as file:
                     uf_text = file.read()
                 extracted_text = [item for item in uf_text.split('\n') if item != '']
-                # institution-specific analysis
+                # Institution-specific analysis
                 if institution == 'Chase':
                     if document == 'Sapphire Preferred': # Chase CC
                         hints_enabled and print(chase_sapphire_pref)
@@ -65,11 +65,11 @@ def main(test: bool, hints_enabled: bool) -> None:
                         sfcu_checking.main(test, hints_enabled, uf_text)
                         hints_enabled and print(f"HINT: program resetting...")
                         time.sleep(2)
-                elif institution == 'Synchrony': # Synchrony
+                elif institution == 'Synchrony': # Synchrony Car Care
                     synchrony_car_care.main(test, hints_enabled, extracted_text)
                     hints_enabled and print(f"HINT: program resetting...")
                     time.sleep(2)
-                elif institution == 'PayPal': # PayPal
+                elif institution == 'PayPal': # PayPal Credit
                     paypal_credit.main(test, hints_enabled, extracted_text)
                     hints_enabled and print(f"HINT: program resetting...")
                     time.sleep(2)
@@ -82,8 +82,8 @@ def main(test: bool, hints_enabled: bool) -> None:
 
 
 if __name__ == '__main__':
-    test = True
-    hints_enabled = True
+    test = False
+    hints_enabled = False
     main(test, hints_enabled)
 
 

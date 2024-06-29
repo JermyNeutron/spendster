@@ -1,19 +1,14 @@
 # Chase Checking
 
-import csv
 import re
 import sys
 
 sys.path.append('.')
 
-import pyperclip
-
-from functions.inst_pars import extraction_func_def
-from .calendar_months import months_dict # preceding '.' for main.py execution
-
-
-# Dictionary keys to return.
-stmt_essential_keys = ['month', 'period', 'balance',]
+from functions.calendar_months import months_dict
+from functions.create_csv import create_csv
+from functions.inst_pars import extraction_func_def # Testing
+from functions.unpack_dict import unpack_dict
 
 
 # Transaction class (currently UNUSED).
@@ -67,19 +62,6 @@ def find_ending_balance(hints_enabled: bool, extracted_text: list) -> str:
             return line.strip()
 
 
-# Unpack stmt_essential_dict items into CSV.
-def unpack_dict(hints_enabled: bool, stmt_essential_dict: dict) -> list:
-    keyval_pair = []
-    for key, value in stmt_essential_dict.items():
-        keyval_pair.append((key, value))
-    if hints_enabled:
-        print('\nHINT:',unpack_dict)
-        for i in keyval_pair:
-            print('HINT: unpacking', i)
-    print() # white space
-    return keyval_pair
-
-
 # Centralized scraping function.
 def transaction_scrape(hints_enabled: bool, extracted_text: list, counter: int, end_phrase: str) -> list:
     date_format = re.compile(r'^\d{2}/\d{2}$')
@@ -114,7 +96,7 @@ def find_starting_transactions(hints_enabled: bool, extracted_text: list) -> lis
     keyphrase = "Beginning Balance"
     end_phrase = "*end*transaction detail"
     occurences = []
-    # find line number for keyphrase.
+    # Find line number for keyphrase.
     for i, line in enumerate(extracted_text, start=1):
         if keyphrase in line.strip():
             hints_enabled and print(f"HINT: {find_starting_transactions}: {i}, {line}")
@@ -154,34 +136,14 @@ def find_adl_transactions(hints_enabled: bool, extracted_text: list, sp_counter:
     return transaction_scrape(hints_enabled, extracted_text, sp_counter, end_phrase)
 
 
-# Pack and write organized data in to CSV.
-def create_csv(test: bool, hints_enabled: bool, export_text: list) -> None:
-    path = 'temp/temp.csv' if not test else 'temp/test_temp.csv'
-    with open(path, mode='w', newline='') as file: # writes CSV.
-        writer = csv.writer(file)
-        writer.writerows(export_text)
-        hints_enabled and print('\nHINT: CSV created.')
-    with open(path, 'r', newline='') as file:
-        csv_data = list(csv.reader(file))
-        formatted_data = '\n'.join('\t'.join(row) for row in csv_data)
-        pyperclip.copy(formatted_data)
-        print("CSV content has been copied to clipboard. You can now paste it using CTRL+V.")
-    if test: # converts type list into string to write into .txt.
-        csv_view = 'temp/test_csv_view.txt'
-        with open(csv_view, 'w') as file:
-            for item in export_text:
-                file.write(f"{str(item)}\n")
-        hints_enabled and print('HINT: CSV view created...')
-
-
 # Main function of script.
-def main(test: bool, hints_enabled: bool, extracted_text: list, stmt_essential_keys: list = stmt_essential_keys) -> None:
-    # Collecting CSV headers.
+def main(test: bool, hints_enabled: bool, extracted_text: list) -> None:
+    stmt_essential_keys = ['month', 'period', 'balance',]
+    stmt_essential_dict = {key: None for key in stmt_essential_keys}
     export_text = []
     if hints_enabled:
         print('\nHINT:', main)
         print(F"HINT: Statement CSV headers")
-    stmt_essential_dict = {key: None for key in stmt_essential_keys}
     stmt_essential_dict['month'], stmt_essential_dict['period'] = find_month(hints_enabled, extracted_text)
     stmt_essential_dict['balance'] = find_ending_balance(hints_enabled, extracted_text)
     export_text.extend(unpack_dict(hints_enabled, stmt_essential_dict))

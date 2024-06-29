@@ -17,6 +17,10 @@ test_temp_scrape.txt
 test_temp.csv
 word_scratch.py
 
+# Public Files
+temp/temp.csv
+temp/temp_scrape.txt
+
 # VS Code workspace
 spendster.code-workspace
 spendster_workspace.code-workspace

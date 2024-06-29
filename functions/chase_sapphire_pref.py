@@ -1,34 +1,25 @@
 # Chase Sapphire Preferred
 
-import csv
 import re
 import sys
 
 sys.path.append('.')
 
-import pyperclip
-
-from functions.inst_pars import extraction_func_def
-from .calendar_months import months_dict # preceding '.' for main.py execution
-
-
-# Dictionary keys to return.
-stmt_essential_keys = ['month', 'balance', 'payment', 'points']
+from functions.calendar_months import months_dict
+from functions.create_csv import create_csv
+from functions.inst_pars import extraction_func_def # Testing
+from functions.unpack_dict import unpack_dict
 
 
 # Scrape document.
 def keyword_search(hints_enabled: bool, extracted_text: list, keyphrase: str) -> str:
-    # lines = extracted_text.splitlines()
     for i, line in enumerate(extracted_text):
         if keyphrase in line:
-            # if there are 2 more lines of text, capture text
+            # If there are 2 more lines of text, capture text
             if i + 2 < len(extracted_text):
                 hints_enabled and print(f"HINT: returning {extracted_text[i+1]}")
                 return extracted_text[i+1].strip()
     return None
-
-
-''' Dictionary assignment functions '''
 
 
 # Find statement's month.
@@ -63,15 +54,6 @@ def find_min_payment(hints_enabled: bool, extracted_text: list) -> str:
 def find_available_points(hints_enabled: bool, extracted_text: list) -> str:
     keyphrase = 'redemption'
     return keyword_search(hints_enabled, extracted_text, keyphrase)
-
-
-# Unpack stmt_essential_dict items into csv
-def unpack_dict(hints_enabled: bool, stmt_essential_dict: dict) -> list:
-    keyval_pair = []
-    for key, value in stmt_essential_dict.items():
-        keyval_pair.append((key, value))
-    hints_enabled and print('\nHINT: Unpacking dictionary...')
-    return keyval_pair
 
 
 ''' First page scraping '''
@@ -119,10 +101,8 @@ def find_starting_dates(hints_enabled: bool, extracted_text: list) -> tuple[list
     retro_counter = 0
     counter = 0
     phrase = 'PURCHASE'
-    print(type(extracted_text))
     for line_number, line in enumerate(extracted_text, start=1):
         if phrase in line:
-            print(line_number)
             retro_counter = line_number # counter for count_backwards()
             counter = line_number + 1 # add 1 to counter to start on dates
             hints_enabled and print(f"\nHINT: dates start at: {counter}")
@@ -310,30 +290,12 @@ def find_addl_amounts(hints_enabled: bool, extracted_text: list, limit: int) -> 
     return price_amounts
 
 
-# Pack and write organized data into csv.
-def create_csv(test: bool, export_text: list) -> None:
-    path = 'temp/temp.csv' if not test else 'temp/test_temp.csv'
-    with open(path, mode='w', newline='') as file: # writes CSV
-        writer = csv.writer(file)
-        writer.writerows(export_text)
-    with open(path, 'r', newline='') as file:
-        csv_data = list(csv.reader(file))
-        formatted_data = '\n'.join('\t'.join(row) for row in csv_data)
-        pyperclip.copy(formatted_data)
-        print("CSV content has been copied to clipboard. You can now paste it using CTRL+V.")
-    if test: # converts type: list into string to write into .txt
-        csv_view = 'temp/test_csv_view.txt'
-        with open(csv_view, 'w') as file:
-            for item in export_text:
-                file.write(f"{str(item)}\n")
-        print('TEST: csv view created...')
-
-
 # Main function of script.
-def main(test: bool, hints_enabled: bool, extracted_text: list, stmt_essential_keys: list = stmt_essential_keys) -> None:
+def main(test: bool, hints_enabled: bool, extracted_text: list) -> None:
     hints_enabled and print(f"\n\nHINT: {main} running...\n")
     # Set up return statement.
     export_text = []
+    stmt_essential_keys = ['month', 'balance', 'payment', 'points']
     stmt_essential_dict = {key: None for key in stmt_essential_keys}
     # Dictionary population functions.
     stmt_essential_dict['month'] = " ".join((find_month(hints_enabled, extracted_text)).split()) # Removes double space.
@@ -356,7 +318,7 @@ def main(test: bool, hints_enabled: bool, extracted_text: list, stmt_essential_k
     export_text.extend(stmt_transactions)
     # [Balance, Minimum Payment, Reward Points]
     hints_enabled and print(F"\nHINT: fnc return {stmt_essential_dict}")
-    create_csv(test, export_text)
+    create_csv(test, hints_enabled, export_text)
 
 
 if __name__ == '__main__':
