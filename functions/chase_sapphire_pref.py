@@ -119,10 +119,8 @@ def find_starting_dates(hints_enabled: bool, extracted_text: list) -> tuple[list
     retro_counter = 0
     counter = 0
     phrase = 'PURCHASE'
-    print(type(extracted_text))
     for line_number, line in enumerate(extracted_text, start=1):
         if phrase in line:
-            print(line_number)
             retro_counter = line_number # counter for count_backwards()
             counter = line_number + 1 # add 1 to counter to start on dates
             hints_enabled and print(f"\nHINT: dates start at: {counter}")
