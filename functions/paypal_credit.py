@@ -8,108 +8,53 @@ sys.path.append('.')
 
 import pyperclip
 
-from functions.inst_pars import extraction_func, extraction_writing
+from functions.inst_pars import extraction_func_pypdf2, extraction_writing
 from functions.calendar_months import months_dict # preceding '.' for main.py execution
 
 
-def keyphrase_ambig_search(hints_enabled: bool, extracted_text: list, keyphrase: str) -> int:
-    occurences = []
-    for i, line in enumerate(extracted_text, start=1):
-        if keyphrase in line:
-            occurences.append(i)
-    if hints_enabled:
-        print('\nHINT:', keyphrase_search)
-        print('HINT:', occurences)
-    return occurences
-
-def keyphrase_search(hints_enabled: bool, extracted_text: list, keyphrase: str) -> int:
-    occurences = []
-    for i, line in enumerate(extracted_text, start=1):
-        if keyphrase == line.strip():
-            occurences.append(i)
-    if hints_enabled:
-        print('\nHINT:', keyphrase_search)
-        print('HINT:', occurences)
-    return occurences
+def stmt_essential_extrap(uf_str: str, keyphrase: str) -> str:
+    return uf_str.replace(keyphrase, '')
 
 
-def find_month(hints_enabled: bool, extracted_text: list) -> str:
-    keyphrase = 'Statement Closing Date:'
-    counter = keyphrase_ambig_search(hints_enabled, extracted_text, keyphrase)[0] # Expect single counter    
-    for i, line in enumerate(extracted_text, start=1):
-        if i == counter:
-            sel_line = line
-            break
-    sel_line = sel_line.replace(keyphrase, '').strip()
-    var_month = sel_line.split(' ')[-1].split('/')[0]
-    var_year = sel_line.split(' ')[-1].split('/')[-1]
-    for i, month in months_dict.items():
-        if int(var_month) == i:
-            hints_enabled and print(f"HINT: Returning statement month {{{i}}}: {month} 20{var_year}")
-            return f'{month} 20{var_year}'
-        
+def find_month(hints_enabled: bool, uf_str: str) -> str:
+    month_str = uf_str.replace('Payment Due Date: ', '').split('/')
+    var_month = month_str[0]
+    for key, value in months_dict.items():
+        if int(var_month) == key:
+            return_month = value
+    hints_enabled and print(f'HINT: returning statement month: {return_month} 20{month_str[-1]}')
+    return f'{return_month} 20{month_str[-1]}'
 
-def find_balance(hints_enabled: bool, extracted_text: list) -> str:
-    keyphrase = 'New Balance'
-    counter = keyphrase_search(hints_enabled, extracted_text, keyphrase)[0]
-    for i, line in enumerate(extracted_text, start=1):
-        if i == counter:
-            hints_enabled and print('HINT: returning statement balance:', extracted_text[i])
-            return extracted_text[i]
-        
 
-def find_minimum(hints_enabled: bool, extracted_text: list) -> str:
-    keyphrase = 'Minimum Payment Due'
-    counter = keyphrase_search(hints_enabled, extracted_text, keyphrase)[0]
-    for i, line in enumerate(extracted_text, start=1):
-        if i == counter:
-            hints_enabled and print('HINT: returning statement minimum due:', extracted_text[i])
-            return extracted_text[i]
+def trx_fil(trx_str: str) -> list:
+    skip_phrases = ['Standard', 'Deferred', 'No Interest If Paid In Full']
+    for i in skip_phrases:
+        trx_str = trx_str.replace(i, '')
+    return trx_str.split()
 
 
 def find_transactions(hints_enabled: bool, extracted_text: list) -> list:
-    keyphrase = '\nDescription\nAmount'
-    end_phrase = 'Total Purchases & Adjustments'
-    skip_phrase = 'No Interest If Paid In Full'
     transactions_arr = []
-    path = 'temp/test_temp_scrape.txt'
-    with open(path, 'r', encoding='utf-8', errors='replace') as file:
-        uf_text = file.read()
-        index = 0
-        line_number = 1
-        occurences = []
-        while index != -1:
-            index = uf_text.find(keyphrase, index)
-            if index != -1:
-                line_number = uf_text[:index].count('\n')
-                line_number += 1
-                occurences.append(line_number)
-                index += len(keyphrase)
-    print(occurences)
-    # counter = occurences[-1]
-    # for i, line in enumerate(extracted_text, start=1):
-    #     if i == counter:
-    #         j = i + 2
-    #         while j < len(extracted_text):
-    #             if j + 6 < len(extracted_text):
-    #                 if end_phrase in extracted_text[j]:
-    #                     if hints_enabled:
-    #                         print('\nHINT:', find_transactions)
-    #                         print('HINT: transactions',transactions_arr)
-    #                     return transactions_arr
-    #                 else:
-    #                     trx_date = extracted_text[j].strip()
-    #                     trx_merchant = extracted_text[j+4].strip()
-    #                     if skip_phrase in extracted_text[j+5]:
-    #                         trx_amount = extracted_text[j+6].strip()
-    #                         trx_ind = (trx_date, trx_amount, trx_merchant)
-    #                         transactions_arr.append(trx_ind)
-    #                         j+=7
-    #                     else:
-    #                         trx_amount = extracted_text[j+5].strip()
-    #                         trx_ind = (trx_date, trx_amount, trx_merchant)
-    #                         transactions_arr.append(trx_ind)
-    #                         j+=6
+    keyphrase = 'PURCHASES & ADJUSTMENTS'
+    end_phrase = 'Total Purchases'
+    for i, line in enumerate(extracted_text, start=1):
+        if keyphrase == re.sub(r'\s+', ' ', line):
+            j = i + 1
+            while j < len(extracted_text):
+                if end_phrase not in extracted_text[j]:
+                    trx_str = trx_fil(extracted_text[j])
+                    trx_date = trx_str[0]
+                    trx_amount = trx_str[-1]
+                    trx_merchant = ' '.join(trx_str[3:-1])
+                    trx_ind = [trx_date, trx_amount, trx_merchant]
+                    transactions_arr.append(trx_ind)
+                    j += 1
+                else:
+                    if hints_enabled:
+                        print('\nHINT:', find_transactions)
+                        for i in transactions_arr:
+                            print('HINT:', i)
+                    return transactions_arr
 
 
 # Unpack stmt_essential_dict items into CSV.
@@ -121,7 +66,6 @@ def unpack_dict(hints_enabled: bool, stmt_essential_dict: dict) -> list:
         print('\nHINT:', unpack_dict)
         for i in keyval_par:
             print('HINT: unpacking', i)
-    print()
     return keyval_par
 
 
@@ -148,23 +92,22 @@ def main(test: bool, hints_enabled: bool, extracted_text: list) -> None:
     export_data = []
     stmt_essential_keys = ['month', 'balance', 'payment']
     stmt_essential_dict = {key: None for key in stmt_essential_keys}
-    stmt_essential_dict['month'] = find_month(hints_enabled, extracted_text)
-    stmt_essential_dict['balance'] = find_balance(hints_enabled, extracted_text)
-    stmt_essential_dict['payment'] = find_minimum(hints_enabled, extracted_text)
+    stmt_essential_dict['month'] = find_month(hints_enabled, extracted_text[-2])
+    stmt_essential_dict['balance'] = stmt_essential_extrap(extracted_text[-3], 'New Balance: $')
+    stmt_essential_dict['payment'] = stmt_essential_extrap(extracted_text[-1], 'Minimum Payment Due: $')
     export_data.extend(unpack_dict(hints_enabled, stmt_essential_dict))
-    find_transactions(hints_enabled, extracted_text)
-    # export_data.extend(find_transactions(hints_enabled, extracted_text))
-    # create_csv(test, hints_enabled, export_data)
+    export_data.extend(find_transactions(hints_enabled, extracted_text))
+    create_csv(test, hints_enabled, export_data)
 
 
 if __name__ == '__main__':
     test = True
     hints_enabled = True
-    path = 'rep_statements/paypal_05.pdf'
-    uf_text = extraction_func(path)
-    extraction_writing(test, uf_text)
+    path = 'rep_statements/paypal_11.pdf'
+    uf_text = extraction_func_pypdf2(path)
     extracted_text = [item.strip() for item in uf_text.split('\n') if item != '']
-    # for item in extracted_text:
-    #     re.sub(r'\s+', ' ', item)
-
+    write_text = ''
+    for i, line in enumerate(extracted_text, start=1):
+        write_text += f'{i} {line}\n'
+    extraction_writing(test, write_text)
     main(test, hints_enabled, extracted_text)
