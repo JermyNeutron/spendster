@@ -1,9 +1,14 @@
 Functions/
--- inst_pars.py
-     -- extraction_func | text
-     -- extraction_writing = .txt written
-     -- ident_inst | institution, document
-     -- main | institution, document   
+-- chase_checking.py
+     *class Transaction (for future implementation)
+     -- keyword_search | string
+     -- find_month | (f"{var_month} {var_year}", return_text)
+     -- find_ending_balance | return ending balance
+     -- transaction_scrape | [transaction array]
+     -- find_starting_transactions | results of transaction_scrape
+     
+     -- is_adl | boolean
+     -- find_adl_transactions | [results of transaction_scrape]
 
 -- chase_sapphire_pref.py
      -- keyword_search | return index
@@ -12,7 +17,6 @@ Functions/
      -- find_new_balance | return balance line
      -- find_min_payment | return minimum payment line
      -- find_available_points | return available points line
-     -- unpack_dict | return dictionary as writable string
 
      // first page scrape
 
@@ -23,15 +27,49 @@ Functions/
           -- find_price_counter | return starting price line
      -- find_starting_amounts | return prices, line
      -- is_sp | return boolean if multiple transaction pages exist
-     -- find_addl_dates | 
-     -- find_addl_merchants |
-     -- find_addl_amounts | 
-     -- create_csv | creates csv
-     -- main | creates csv, no return
+     -- find_addl_dates | return [dates, counter]
+     -- find_addl_merchants | return [merchants]
+     -- find_addl_amounts | return [amounts]
 
+-- paypal_credit.py
+     -- stmt_essential_extrap | return given string
+     -- find_month | return f'{return_month} 20{month_str[-1]}'
+     -- trx_fil | return [string separated by spaces <.split()>]
+     -- find_transactions | return [transactions]
 
--- chase_checking.py
+-- sfcu_checking.py
+     -- fil_text | return [extracted_text]
+     -- find_month | return statement month
+     -- find_starting_bal | return [statement balance, counter]
+     -- find_ending_bal | return statement ending balance
+     -- fil_trx | return [filtered_text]
+     -- find_transactions | return [transactions]
 
+-- sfcu_inspire.py
+     -- keyphrase_search | return counter
+     -- find_month | return f"{months_dict[key]} {dp_year}", counter
+     -- find_amount_due | return statement amount
+     --find_transactions | return [transactions]
+
+-- synchrony_car_care.py
+     -- keyphrase_search | return [occurences]
+     -- find_month | return f'{month} {var_year}'
+     -- find_balance | return [statement balance, counter]
+     -- find_minimum | return payment
+     -- find_transactions | [transactions]
+
+-- create_csv.py
+     -- create_csv | none
+
+-- inst_pars.py
+     -- extraction_func_def | text
+     -- extraction_func_pypdf2 | text
+     -- extraction_writing = .txt written
+     -- ident_inst | institution, document
+     -- main | institution, document   
+
+--unpack_dict.py
+     -- unpack_dict | [stmt_essential keys and values]
 
 main.py
     -- pdf_drag_drop | pdflink
