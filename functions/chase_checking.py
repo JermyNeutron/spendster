@@ -8,7 +8,7 @@ sys.path.append('.')
 
 import pyperclip
 
-from functions.inst_pars import extraction_func
+from functions.inst_pars import extraction_func_def
 from .calendar_months import months_dict # preceding '.' for main.py execution
 
 
@@ -201,7 +201,7 @@ if __name__ == '__main__':
     # path = 'rep_statements/20240320-statements-9266-.pdf'
     path = 'rep_statements/20240320-statements-9266-.pdf'
     with open(path, 'r', encoding="utf-8", errors="replace") as file:
-        text = extraction_func(path)
+        text = extraction_func_def(path)
     extracted_text = [item for item in text.split('\n') if item != '']
     main(test, hints_enabled, extracted_text)
 

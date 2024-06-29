@@ -8,7 +8,7 @@ sys.path.append('.')
 
 import pyperclip
 
-from functions.inst_pars import extraction_func
+from functions.inst_pars import extraction_func_def
 from .calendar_months import months_dict # preceding '.' for main.py execution
 
 
@@ -371,7 +371,7 @@ if __name__ == '__main__':
         path = option_2
     else:
         path = option_1
-    text = extraction_func(path)
+    text = extraction_func_def(path)
     extracted_text = [item for item in text.split('\n') if item != '']
     main(test, hints_enabled, extracted_text)
     if test:

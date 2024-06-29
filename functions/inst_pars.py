@@ -1,25 +1,41 @@
 # Institution Parser
 import warnings
 
+import PyPDF2 as pypdf2
 from pdfminer.high_level import extract_text as pdfmextract_text
 
 
 '''Supported Institutions and Statements
 - Chase Sapphire Preferred
-- Chase Debit (WIP)
+- Chase Checking
+- PayPal Credit
+- SchoolsFirst Checking
+- SchoolsFirst Inspire
+- Synchrony Car Care
 '''
 
 list_institutions = {
     'Chase': ['Sapphire Preferred', 'Chase debit',],
     'SchoolsFirst': ['www.SchoolsFirstFcu.org', 'www.SchoolsFirstfcu.org',], # save 'MasterCard' if URL ever gets fixed on Checking
     'Synchrony': ['SYNCHRONY CAR CARE',],
+    'PayPal': ['PayPal Credit',],
 }
 
 
 # Extract text from the provided path.
-def extraction_func(path: str) -> str:
+def extraction_func_def(path: str) -> str:
     text = pdfmextract_text(path)
     return text
+
+
+def extraction_func_pypdf2(path: str) -> str:
+    with open(path, 'rb') as file:
+        reader = pypdf2.PdfReader(file)
+        return_text = ""
+        for page_num in range(len(reader.pages)):
+            page = reader.pages[page_num]
+            return_text += page.extract_text()
+            return return_text
 
 
 # Write the extracted text to temp file.
@@ -44,7 +60,7 @@ def ident_inst(hints_enabled: bool, extracted_text: list) -> tuple[str, str]:
 
 # Main function of script.
 def main(test: bool, hints_enabled: bool, path: str) -> tuple[str, str]:
-    extracted_text = extraction_func(path)
+    extracted_text = extraction_func_def(path)
     inst_select, inst_doc = ident_inst(hints_enabled, extracted_text)
     if inst_select == 'Chase':
         if hints_enabled:
@@ -58,9 +74,16 @@ def main(test: bool, hints_enabled: bool, path: str) -> tuple[str, str]:
         if hints_enabled:
             print(f'HINT: {ident_inst}: INSTITUTION FOUND: {inst_doc}')
             print(f'HINT: returning {inst_select}, {inst_doc}')
+    elif inst_select == 'PayPal':
+        if hints_enabled:
+            print(f'HINT: {ident_inst}: INSTITUTION FOUND: {inst_doc}')
+            print(f'HINT: returning {inst_select}, {inst_doc}')
     else: # change to elif
         hints_enabled and warnings.warn('Unidentified document presented!')
         return None
+    if inst_select == 'PayPal':
+        print('doing paypal')
+        extracted_text = extraction_func_pypdf2(path)
     extraction_writing(test, extracted_text)
     return inst_select, inst_doc
 
@@ -75,6 +98,8 @@ if __name__ == '__main__':
     path_5 = 'rep_statements\sfcu-ch-05.pdf'
     path_6 = 'rep_statements\synchrony_03.pdf'
     path_7 = 'rep_statements\synchrony_06.pdf'
+    path_8 = 'rep_statements\paypal_03.pdf'
+    path_9 = 'rep_statements\paypal_11.pdf'
     test_choice = input('Choose path: ')
     try:
         match test_choice:
@@ -92,6 +117,10 @@ if __name__ == '__main__':
                 main(test, hints_enabled, path_6)
             case '7':
                 main(test, hints_enabled, path_7)
+            case '8':
+                main(test, hints_enabled, path_8)
+            case '9':
+                main(test, hints_enabled, path_9)
             case 'q':
                 pass
     except NameError as e:

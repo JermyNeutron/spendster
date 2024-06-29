@@ -8,7 +8,7 @@ import pyperclip
 
 sys.path.append('.')
 
-from functions.inst_pars import extraction_func, extraction_writing
+from functions.inst_pars import extraction_func_def, extraction_writing # REMOVABLE
 from .calendar_months import months_dict # preceding '.' for main.py execution
 
 
@@ -151,7 +151,7 @@ if __name__ == '__main__':
     path = 'rep_statements/synchrony_06.pdf'
     # path = 'rep_statements/synchrony_05.pdf'
     # path = 'rep_statements/synchrony_06.pdf'
-    uf_text = extraction_func(path)
+    uf_text = extraction_func_def(path)
     extraction_writing(test, uf_text)
     extracted_text = [item.strip() for item in uf_text.split('\n') if item != '']
 

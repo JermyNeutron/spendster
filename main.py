@@ -7,7 +7,7 @@ sys.path.append('.')
 import pdfminer
 import pdfminer.pdfparser
 
-from functions import inst_pars, chase_sapphire_pref, chase_checking, sfcu_checking, sfcu_inspire, synchrony
+from functions import inst_pars, chase_sapphire_pref, chase_checking, sfcu_checking, sfcu_inspire, synchrony_car_care, paypal_credit
 
 
 # PDF file drag and drop prompt.
@@ -66,7 +66,11 @@ def main(test: bool, hints_enabled: bool) -> None:
                         hints_enabled and print(f"HINT: program resetting...")
                         time.sleep(2)
                 elif institution == 'Synchrony': # Synchrony
-                    synchrony.main(test, hints_enabled, extracted_text)
+                    synchrony_car_care.main(test, hints_enabled, extracted_text)
+                    hints_enabled and print(f"HINT: program resetting...")
+                    time.sleep(2)
+                elif institution == 'PayPal': # PayPal
+                    paypal_credit.main(test, hints_enabled, extracted_text)
                     hints_enabled and print(f"HINT: program resetting...")
                     time.sleep(2)
                 else:
