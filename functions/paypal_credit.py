@@ -1,15 +1,14 @@
 # PayPal Credit
 
-import csv
 import re
 import sys
 
 sys.path.append('.')
 
-import pyperclip
-
-from functions.inst_pars import extraction_func_pypdf2, extraction_writing
-from functions.calendar_months import months_dict # preceding '.' for main.py execution
+from functions.calendar_months import months_dict
+from functions.create_csv import create_csv
+from functions.inst_pars import extraction_func_pypdf2, extraction_writing # Testing
+from functions.unpack_dict import unpack_dict
 
 
 def stmt_essential_extrap(uf_str: str, keyphrase: str) -> str:
@@ -55,37 +54,6 @@ def find_transactions(hints_enabled: bool, extracted_text: list) -> list:
                         for i in transactions_arr:
                             print('HINT:', i)
                     return transactions_arr
-
-
-# Unpack stmt_essential_dict items into CSV.
-def unpack_dict(hints_enabled: bool, stmt_essential_dict: dict) -> list:
-    keyval_par = []
-    for key, value in stmt_essential_dict.items():
-        keyval_par.append((key, value))
-    if hints_enabled:
-        print('\nHINT:', unpack_dict)
-        for i in keyval_par:
-            print('HINT: unpacking', i)
-    return keyval_par
-
-
-def create_csv(test: bool, hints_enabled: bool, export_data: list) -> None:
-    path = 'temp/temp.csv' if not test else 'temp/test_temp.csv'
-    with open(path, mode='w', newline='') as file: # writes CSV
-        writer = csv.writer(file)
-        writer.writerows(export_data)
-        hints_enabled and print('\nHINT: CSV created.')
-    with open(path, 'r', newline='') as file:
-        csv_data = list(csv.reader(file))
-        formatted_data = '\n'.join('\t'.join(row) for row in csv_data)
-        pyperclip.copy(formatted_data) # copies CSV into clipboard
-        print("CSV content has been copied to clipboard. You can now paste it using CTRL+V")
-    if test:
-        csv_view = 'temp/test_csv_view.txt'
-        with open(csv_view, 'w') as file:
-            for item in export_data:
-                file.write(f"{str(item)}\n")
-        hints_enabled and print('\nHINT: CSV view created...')
 
 
 def main(test: bool, hints_enabled: bool, extracted_text: list) -> None:

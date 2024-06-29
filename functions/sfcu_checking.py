@@ -1,13 +1,10 @@
 # Schoolsfirst Checking
-import csv
+
 import re
 import warnings
 
-import pyperclip
-
-
-# Dictionary keys to return.
-stmt_essential_keys = ['month', 'starting balance', 'ending balance']
+from functions.create_csv import create_csv
+from functions.unpack_dict import unpack_dict
 
 
 # Text cleaning.
@@ -61,19 +58,6 @@ def find_ending_bal(hints_enabled: bool, extracted_text: list) -> str:
     return extracted_text[ending_bal]
 
 
-# Unpack stmt_essential_dict items into CSV.
-def unpack_dict(hints_enabled: bool, stmt_essential_dict: dict) -> list:
-    keyval_par = []
-    for key, value in stmt_essential_dict.items():
-        keyval_par.append((key, value))
-    if hints_enabled:
-        print('\nHINT:', unpack_dict)
-        for i in keyval_par:
-            print('HINT: unpacking', i)
-    print()
-    return keyval_par
-
-
 def fil_trx(hints_enabled: bool, extracted_text: list,) -> list:
     filtered_text = []
     flags = []
@@ -117,29 +101,11 @@ def find_transactions(hints_enabled: bool, extracted_text: list, counter: int) -
                         j+=5
 
 
-def create_csv(test: bool, hints_enabled: bool, export_text: list) -> None:
-    path = 'temp/temp.csv' if not test else 'temp/test_temp.csv'
-    with open(path, mode='w', newline='') as file: # writes CSV
-        writer = csv.writer(file)
-        writer.writerows(export_text)
-        hints_enabled and print('\nHINT: CSV created.')
-    with open(path, 'r', newline='') as file:
-        csv_data = list(csv.reader(file))
-        formatted_data = '\n'.join('\t'.join(row) for row in csv_data)
-        pyperclip.copy(formatted_data) # copies CSV into clipboard
-        print("CSV content has been copied to clipboard. You can now paste it using CTRL+V")
-    if test:
-        csv_view = 'temp/test_csv_view.txt'
-        with open(csv_view, 'w') as file:
-            for item in export_text:
-                file.write(f"{str(item)}\n")
-        hints_enabled and print('\nHINT: CSV view created...')
-
-
 # Main function of script.
 def main(test: bool, hints_enabled: bool, uf_text: str) -> None:
     hints_enabled and print('sfcu_checking.main() executing...')
     export_text = []
+    stmt_essential_keys = ['month', 'starting balance', 'ending balance']
     stmt_essential_dict = {key: None for key in stmt_essential_keys}
     extracted_text = fil_text(uf_text)
     stmt_essential_dict['month'] = find_month(hints_enabled, extracted_text)

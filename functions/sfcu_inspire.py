@@ -1,15 +1,15 @@
 # Schoolsfirst Inspire
-import csv
+
 import re
 import sys
 import warnings
 
-import pyperclip
-
 sys.path.append('.') # POSSIBLY REMOVABLE
 
+from functions.calendar_months import months_dict
+from functions.create_csv import create_csv
 from functions.inst_pars import extraction_func_def, extraction_writing # REMOVEABLE
-from .calendar_months import months_dict # preceding '.' for main.py execution
+from functions.unpack_dict import unpack_dict
 
 
 # Return first occurence of keyphrase
@@ -72,42 +72,12 @@ def find_transactions(hints_enabled: bool, extracted_text: list) -> list:
                         j+=6
 
 
-def unpack_dict(hints_enabled: bool, stmt_essential_dict: dict) -> list:
-    keyval_par = []
-    for key, value in stmt_essential_dict.items():
-        keyval_par.append((key, value))
-    if hints_enabled:
-        print('\nHINT:', unpack_dict)
-        for i in keyval_par:
-            print(f"HINT: unpacking", i)
-    return keyval_par
-
-
-def create_csv(test: bool, hints_enabled: bool, export_text: list) -> None:
-    path = 'temp/temp.csv' if not test else 'temp/test_temp.csv'
-    with open(path, mode='w', newline='') as file: # writes CSV
-        writer = csv.writer(file)
-        writer.writerows(export_text)
-        hints_enabled and print('\nHINT: CSV created.')
-    with open(path, 'r', newline='') as file:
-        csv_data = list(csv.reader(file))
-        formatted_data = '\n'.join('\t'.join(row) for row in csv_data)
-        pyperclip.copy(formatted_data) # copies CSV into clipboard
-        print("CSV content has been copied to clipboard. You can now paste it using CTRL+V")
-    if test:
-        csv_view = 'temp/test_csv_view.txt'
-        with open(csv_view, 'w') as file:
-            for item in export_text:
-                file.write(f"{str(item)}\n")
-    hints_enabled and print('\nHINT: CSV view created...')
-
-
 def main(test: bool, hints_enabled: bool, extracted_text: list) -> None:
-    stmt_essential_keys = ['month', 'amount due']
+    stmt_essential_keys = ['month', 'balance']
     stmt_essential_dict = {key: None for key in stmt_essential_keys}
     export_text = []
     stmt_essential_dict['month'], counter = find_month(hints_enabled, extracted_text)
-    stmt_essential_dict['amount due'] = find_amount_due(hints_enabled, extracted_text, counter)
+    stmt_essential_dict['balance'] = find_amount_due(hints_enabled, extracted_text, counter)
     fp_trx = find_transactions(hints_enabled, extracted_text)
     export_text.extend(unpack_dict(hints_enabled, stmt_essential_dict))
     export_text.extend(fp_trx)
