@@ -8,7 +8,7 @@ import pyperclip
 
 sys.path.append('.') # POSSIBLY REMOVABLE
 
-from functions.inst_pars import extraction_func, extraction_writing # REMOVEABLE
+from functions.inst_pars import extraction_func_def, extraction_writing # REMOVEABLE
 from .calendar_months import months_dict # preceding '.' for main.py execution
 
 
@@ -119,7 +119,7 @@ if __name__ == '__main__':
     test = True
     hints_enabled = True
     template_path = 'rep_statements\sfcu-cc-05.pdf'
-    uf_text= extraction_func(template_path)
+    uf_text= extraction_func_def(template_path)
     extraction_writing(test, uf_text)
     path = 'temp/test_temp_scrape.txt'
     with open(path, 'r') as file:
