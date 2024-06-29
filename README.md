@@ -2,7 +2,7 @@
 A quick way to scrape your bank and credit card statements for your own personal tracking.
 
 >[!WARNING]
-> As of 06/27/2024, these are the only supported statements:
+> As of 06/28/2024, these are the only supported statements:
 >
 > **Checking Accounts**
 > - Chase Checking (+2 transaction pages)
@@ -12,7 +12,7 @@ A quick way to scrape your bank and credit card statements for your own personal
 > - Chase Sapphire Preferred (+2 transaction pages, card payments/credits not included)
 > - SchoolsFirst Credit Union Inspire (1 page)
 > - Synchrony Car Care (1 page)
-> - (**WIP**) PayPal Credit
+> - PayPal Credit (1 page)
 >
 > This will be updated as additional statements and institutions are prepared. 
 
@@ -31,6 +31,7 @@ Not at this time. This program can only filter one document at a time.
 
 ### Libraries
 - pdfminer.six
+- PyPDF2
 - pyperclip
 
 ### Github
