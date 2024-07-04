@@ -51,7 +51,7 @@ def main(test: bool, hints_enabled: bool) -> None:
                         chase_sapphire_pref.main(test, hints_enabled, extracted_text)
                         hints_enabled and print(f"HINT: program resetting...")
                         time.sleep(2)
-                    elif document == 'Chase debit': # Chase Checking
+                    elif document == 'Chase Total Checking': # Chase Checking
                         hints_enabled and print(chase_checking)
                         chase_checking.main(test, hints_enabled, extracted_text)
                         hints_enabled and print(f"HINT: program resetting...")
@@ -82,8 +82,8 @@ def main(test: bool, hints_enabled: bool) -> None:
 
 
 if __name__ == '__main__':
-    test = False
-    hints_enabled = False
+    test = True
+    hints_enabled = True
     main(test, hints_enabled)
 
 
