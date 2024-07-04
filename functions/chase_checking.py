@@ -123,6 +123,7 @@ def is_adl(hints_enabled: bool, extracted_text: list):
                 print(f"HINT: \"{sp_ind}\" found at {i}")
         sp_bool = True
         sp_counter = sp_ind_occurence.pop() + 7
+        hints_enabled and print(f'HINT: is_adl returning {sp_bool}, {sp_ind_occurence}')
         return sp_bool, sp_counter
     return sp_bool, None
 
@@ -148,11 +149,11 @@ def main(test: bool, hints_enabled: bool, extracted_text: list) -> None:
     stmt_essential_dict['balance'] = find_ending_balance(hints_enabled, extracted_text)
     export_text.extend(unpack_dict(hints_enabled, stmt_essential_dict))
     transaction_arr: list[str] = find_starting_transactions(hints_enabled, extracted_text)
+    adl_exist, sp_counter = is_adl(hints_enabled, extracted_text)
     export_text.extend(transaction_arr)
-    adl_exit, sp_counter = is_adl(hints_enabled, extracted_text)
-    if adl_exit:
-        transaction_arr.extend(find_adl_transactions(hints_enabled, extracted_text, sp_counter))
-        export_text.extend(transaction_arr)
+    if adl_exist:
+        transaction_arr_sp: list[str] = find_adl_transactions(hints_enabled, extracted_text, sp_counter)
+        export_text.extend(transaction_arr_sp)
     
     create_csv(test, hints_enabled, export_text)
 
