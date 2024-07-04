@@ -82,8 +82,8 @@ def main(test: bool, hints_enabled: bool) -> None:
 
 
 if __name__ == '__main__':
-    test = True
-    hints_enabled = True
+    test = False
+    hints_enabled = False
     main(test, hints_enabled)
 
 
