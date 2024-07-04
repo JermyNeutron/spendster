@@ -3,6 +3,7 @@
 import re
 import warnings
 
+from functions.inst_pars import extraction_writing
 from functions.create_csv import create_csv
 from functions.unpack_dict import unpack_dict
 
@@ -40,6 +41,7 @@ def find_starting_bal(hints_enabled: bool, extracted_text: list) -> tuple[str, i
             if hints_enabled:
                 print('\nHINT:', find_starting_bal)
                 print(f'HINT: Starting balance: {extracted_text[i]}')
+                print(f'HINT: counter starts at {i}')
             return extracted_text[i], i
         
 
@@ -75,6 +77,17 @@ def fil_trx(hints_enabled: bool, extracted_text: list,) -> list:
 
 
 def find_transactions(hints_enabled: bool, extracted_text: list, counter: int) -> list:
+
+
+    # Removes any amounts in merchant string
+    def rm_amt(merchant: str) -> str:
+        temp_var = merchant.split()
+        if '.' in temp_var[-1]:
+            temp_var.pop()
+        return_var = ' '.join(i for i in temp_var)
+        return return_var
+
+
     transactions_arr: list = []
     date_format = re.compile(r'^\d{2}/\d{2}$')
     ending_phrase = 'Combined Minimum Balance'
@@ -93,8 +106,22 @@ def find_transactions(hints_enabled: bool, extracted_text: list, counter: int) -
                         continue
                     else:
                         trx_date = extracted_text[j].strip()
-                        trx_merchant = ' '.join([extracted_text[j+1], extracted_text[j+4]])
-                        trx_amount = extracted_text[j+2].strip()
+
+                        # Removes any attached amounts to merchant string.
+                        temp_merchant = ' '.join([extracted_text[j+1], extracted_text[j+4]])
+                        trx_merchant = rm_amt(temp_merchant)
+
+                        # If no skip phrases, checks to see if [j+2] is an amount.
+                        try:
+                            temp_str = extracted_text[j+2].strip().split()[0].rstrip('-')
+                            float(temp_str)
+                            trx_amount = temp_str
+                        except ValueError as e:
+                            temp_str = extracted_text[j+3].strip().split()[0].rstrip('-')
+                            float(temp_str)
+                            hints_enabled and print(f'valueerror: {temp_str}')
+                            trx_amount = temp_str
+
                         trx_ind = (trx_date, trx_amount, trx_merchant)
                         transactions_arr.append(trx_ind)
                         hints_enabled and print(f"HINT: {trx_date}, {trx_amount}, {trx_merchant}")
