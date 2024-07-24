@@ -7,26 +7,34 @@ sys.path.append('.')
 
 from functions.calendar_months import months_dict
 from functions.create_csv import create_csv
-from functions.inst_pars import extraction_func_def # Testing
+from functions.inst_pars import extraction_func_def, extraction_writing # Testing
 from functions.unpack_dict import unpack_dict
 
 
 # Scrape document.
 def keyword_search(hints_enabled: bool, extracted_text: list, keyphrase: str) -> str:
-    for i, line in enumerate(extracted_text):
+    for i, line in enumerate(extracted_text, start=1):
         if keyphrase in line:
             # If there are 2 more lines of text, capture text
             if i + 2 < len(extracted_text):
-                hints_enabled and print(f"HINT: returning {extracted_text[i+1]}")
-                return extracted_text[i+1].strip()
+                if hints_enabled:
+                    print(f"HINT: returning line number: {i}")
+                    print(f"HINT: returning {extracted_text[i]}")
+                return extracted_text[i].strip()
     return None
 
 
 # Find statement's month.
 def find_month(hints_enabled: bool, extracted_text: list) -> str:
-    keyphrase = 'SCENARIO-1D'
-    return_month = keyword_search(hints_enabled, extracted_text, keyphrase)
-    return month_rollback(return_month)
+    keyphrase = 'Statement Date:'
+    statement_date = keyword_search(hints_enabled, extracted_text, keyphrase)
+    var_m, var_d, var_y = statement_date.split('/')
+    var_m = int(var_m)
+    for i, value in months_dict.items():
+        if var_m == i: 
+            var_m = value
+    return f"{var_m} 20{var_y}"
+            
 
 
 # Rollback find_month() return to correct month.
@@ -59,26 +67,72 @@ def find_available_points(hints_enabled: bool, extracted_text: list) -> str:
 ''' First page scraping '''
 
 # Find starting index for transaction dates.
-def find_starting_dates(hints_enabled: bool, extracted_text: list) -> tuple[list, int, int]:
+def find_starting_dates(hints_enabled: bool, extracted_text: list) -> tuple[list, int, int, int]:
 
 
-    # Count preceding dates to determine text gap to merchants
-    def count_backward(hints_enabled: bool, retro_counter: int) -> int:
-        line_skip = 0
-        skip_array = []
-        retro_counter -= 1
-        while retro_counter < len(extracted_text):
-            for line_number, line in enumerate(extracted_text, start=1):
-                if line_number == retro_counter:
-                    if date_pattern.match(line.strip()):
-                        line_skip += 1
-                        skip_array.append(line.strip())
-                        retro_counter -= 1
-                    else:
-                        if hints_enabled:
-                            print(f"HINT: skipping {{{int(line_skip/2)}}} lines:")
-                            print(*(i for i in skip_array), sep='\n')
-                        return line_skip
+    # Count preceding dates to determine text gap for merchants and amounts
+    def count_backward(hints_enabled: bool, retro_counter: int) -> tuple[int, int]:
+
+
+        def count_skip_merc(retro_counter: int) -> tuple[int, int]:
+            line_skip = 0
+            skipdates = []
+            while retro_counter < len(extracted_text):
+                for line_number, line in enumerate(extracted_text, start=1):
+                    if line_number == retro_counter:
+                            if date_pattern.match(line.strip()):
+                                line_skip += 1
+                                skipdates.append(line.strip())
+                                retro_counter -= 1
+                            else:
+                                if hints_enabled:
+                                    print(f"HINT: seeking skips for merchants...")
+                                    print(f"HINT: skipping {line_skip} lines:")
+                                    print(*(i for i in skipdates), sep='\n')
+                                    print(f"Hint: returning line number for count_skip_amt: {line_number}")
+                                return line_skip, line_number
+
+
+        def count_skip_amt(retro_counter: int) -> int:
+            line_skip = 0
+            skipdates = []
+            ending_phrase = "PAYMENTS AND OTHER CREDITS"
+            while retro_counter < len(extracted_text):
+                for line_number, line in enumerate(extracted_text, start=1):
+                    if line_number == retro_counter:
+                        if ending_phrase not in line:
+                            if date_pattern.match(line.strip()):
+                                line_skip += 1
+                                skipdates.append(line.strip())
+                                if hints_enabled:
+                                    print(f"HINT: seeking skips for amounts...")
+                                    print(f"HINT: skipping line: {line_number}, {line}")
+                            retro_counter -= 1
+                        else:
+                            hints_enabled and print(*(i for i in skipdates), sep='\n')
+                            return line_skip
+                        
+
+        retro_counter -= 1 # initializes backwards count past starting phrase
+        skip_merc, amt_counter = count_skip_merc(retro_counter)
+        skip_amt = count_skip_amt(amt_counter)
+        # skipdates = []
+        # skip_amt = 0
+
+        # while retro_counter < len(extracted_text):
+        #     for line_number, line in enumerate(extracted_text, start=1):
+        #         if line_number == retro_counter:
+        #             if ending_phrase not in line:
+        #                 if date_pattern.match(line.strip()):
+        #                     line_skip += 1
+        #                     skipdates.append(line.strip())
+        #                     retro_counter -= 1
+        #                 else:
+        #                     if hints_enabled:
+        #                         print(f"HINT: seeking line_skips...")
+        #                         print(f"HINT: skipping {line_skip} lines:")
+        #                         print(*(i for i in skipdates), sep='\n')
+        return skip_merc, skip_amt
 
 
     def count_forward(hints_enabled: bool, counter: int) -> tuple[list, int]:
@@ -109,9 +163,9 @@ def find_starting_dates(hints_enabled: bool, extracted_text: list) -> tuple[list
             break
     dates = []
     date_pattern = re.compile(r'^\d{2}/\d{2}$')
-    line_skip = count_backward(hints_enabled, retro_counter)
+    skip_merc, skip_amt = count_backward(hints_enabled, retro_counter)
     dates, counter = count_forward(hints_enabled, counter)
-    return dates, counter, line_skip
+    return dates, counter, skip_merc, skip_amt
 
 
 # Collect first page's merchants.
@@ -165,9 +219,10 @@ def find_starting_merchants(hints_enabled:bool, extracted_text: list, merchant_c
 
 
 # Collect first page's amounts.
-def find_starting_amounts(hints_enabled: bool, extracted_text: list, price_counter: int, line_skip: int, reject_counter: int) -> tuple[list, int]:
-    if line_skip is None:
-        line_skip = 0
+def find_starting_amounts(hints_enabled: bool, extracted_text: list, price_counter: int, skip_merc: int, skip_amt: int, reject_counter: int) -> tuple[list, int]:
+    skip_merc = skip_merc or 0
+    skip_amt = skip_amt or 0
+    line_skip = skip_merc + skip_amt
     if hints_enabled:
         print(f"\nHINT: starting variable {{price_counter}}: {price_counter}")
         print(f"HINT: starting variable {{line_skip}}: {line_skip}")
@@ -305,9 +360,9 @@ def main(test: bool, hints_enabled: bool, extracted_text: list) -> None:
     # Pack export_text to return.
     export_text.extend(unpack_dict(hints_enabled, stmt_essential_dict))
     stmt_transactions = [('Dates', 'Merchants', 'Amount')]
-    fp_dates, fp_mercounter, fp_skipnum = find_starting_dates(hints_enabled, extracted_text)
-    fp_merchants, fp_pricounter, fp_rejectcounter = find_starting_merchants(hints_enabled, extracted_text, fp_mercounter, fp_skipnum)
-    fp_prices, fp_endcounter = find_starting_amounts(hints_enabled, extracted_text, fp_pricounter, fp_skipnum, fp_rejectcounter) # NORMAL: fp_endcounter not referenced anywhere
+    fp_dates, fp_mercounter, skip_merc, skip_amt = find_starting_dates(hints_enabled, extracted_text)
+    fp_merchants, fp_pricounter, fp_rejectcounter = find_starting_merchants(hints_enabled, extracted_text, fp_mercounter, skip_merc)
+    fp_prices, fp_endcounter = find_starting_amounts(hints_enabled, extracted_text, fp_pricounter, skip_merc, skip_amt, fp_rejectcounter) # NORMAL: fp_endcounter not referenced anywhere
     stmt_transactions.extend(zip(fp_dates, fp_prices, fp_merchants))
     if is_sp(hints_enabled, extracted_text):
         sp_dates, sp_mercounter, sp_limit = find_addl_dates(hints_enabled, extracted_text)
@@ -334,6 +389,7 @@ if __name__ == '__main__':
     else:
         path = option_1
     text = extraction_func_def(path)
+    extraction_writing(test, text)
     extracted_text = [item for item in text.split('\n') if item != '']
     main(test, hints_enabled, extracted_text)
     if test:
