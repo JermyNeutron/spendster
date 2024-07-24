@@ -7,6 +7,7 @@ main.dist/
 
 # Scratch Files
 find_line_in_text.py
+hidden_images/
 scratch/
 scratch1.py
 scratch2.py
