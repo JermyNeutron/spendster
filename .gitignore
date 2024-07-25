@@ -19,10 +19,10 @@ test_temp.csv
 word_scratch.py
 
 # Public Files
-temp/temp.csv
-temp/temp_scrape.txt
-Spendster.dist/temp/temp_scrape.txt
-Spendster.dist/temp/temp.csv
+# temp/temp.csv
+# temp/temp_scrape.txt
+# Spendster.dist/temp/temp_scrape.txt
+# Spendster.dist/temp/temp.csv
 
 # VS Code workspace
 spendster.code-workspace
