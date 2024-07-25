@@ -12,10 +12,12 @@ from functions import inst_pars, chase_sapphire_pref, chase_checking, sfcu_check
 
 # PDF file drag and drop prompt.
 def pdf_drag_drop(hints_enabled: bool) -> str:
-    input_pdflink = input('Drag and drop file here: ')
+    input_pdflink = input('\nDrag and drop file here: ')
     # Clean input
     if input_pdflink.lower() == 'q': # Exit
         return False
+    elif input_pdflink.lower() == 'test':
+        return 'TEST'
     else:
         pdflink_pos = input_pdflink.lower().find("c")
         if input_pdflink.lower().endswith('\n'):
@@ -31,12 +33,18 @@ def pdf_drag_drop(hints_enabled: bool) -> str:
 
 
 # PDF location verification and script execution.
-def main(test: bool, hints_enabled: bool) -> None:
-    print('HINT: Enter \'q\' to quickly end this program!\n\n')
+def main(default_test: bool, default_hints_enabled: bool) -> None:
+    print('HINT: Enter \'q\' to quickly end this program!\n')
+    test = default_test # initialize test mode
+    hints_enabled = default_hints_enabled
     while True:
         pdflink = pdf_drag_drop(hints_enabled)
-        if not pdflink:
+        if pdflink == False:
             break
+        elif pdflink == 'TEST':
+            test = hints_enabled = True
+            hints_enabled and print("CONSOLE: Test mode enabled!\n")
+            pass
         try:
             try:
                 institution, document = inst_pars.main(test, hints_enabled, pdflink)
@@ -76,15 +84,15 @@ def main(test: bool, hints_enabled: bool) -> None:
                 else:
                     print('Institution or statement not supported.\nPlease submit an issue and we\'ll get right to it.')
             except pdfminer.pdfparser.PDFSyntaxError as e:
-                print('File not found. Try again.\n')
+                print('File not found. Try again.')
         except FileNotFoundError:
-            print('File not found. Try again.\n')
+            print('File not found. Try again.')
 
 
 if __name__ == '__main__':
-    test = False
-    hints_enabled = False
-    main(test, hints_enabled)
+    default_test = False
+    default_hints_enabled = False
+    main(default_test, default_hints_enabled)
 
 
 '''
