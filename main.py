@@ -44,7 +44,7 @@ def main(default_test: bool, default_hints_enabled: bool) -> None:
         elif pdflink == 'TEST':
             test = hints_enabled = True
             hints_enabled and print("CONSOLE: Test mode enabled!\n")
-            pass
+            continue
         try:
             try:
                 institution, document = inst_pars.main(test, hints_enabled, pdflink)
@@ -84,9 +84,9 @@ def main(default_test: bool, default_hints_enabled: bool) -> None:
                 else:
                     print('Institution or statement not supported.\nPlease submit an issue and we\'ll get right to it.')
             except pdfminer.pdfparser.PDFSyntaxError as e:
-                print('File not found. Try again.')
-        except FileNotFoundError:
-            print('File not found. Try again.')
+                print(f'PDFMiner syntax error. {e}. Try again.')
+        except FileNotFoundError as e:
+            print(f'File not found. {e}. Try again.')
 
 
 if __name__ == '__main__':
