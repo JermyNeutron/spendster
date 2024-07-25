@@ -89,7 +89,7 @@ def find_starting_dates(hints_enabled: bool, extracted_text: list) -> tuple[list
                                     print(f"HINT: seeking skips for merchants...")
                                     print(f"HINT: skipping {line_skip} lines:")
                                     print(*(i for i in skipdates), sep='\n')
-                                    print(f"Hint: returning line number for count_skip_amt: {line_number}")
+                                    print(f"HINT: returning line number for count_skip_amt: {line_number}")
                                 return line_skip, line_number
 
 
